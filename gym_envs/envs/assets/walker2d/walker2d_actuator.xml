@@ -1,0 +1,12 @@
+<mujocoinclude>
+  <actuator>
+    <!-- <motor joint="torso_joint" ctrlrange="-100.0 100.0" isctrllimited="true"/>-->
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="100" joint="thigh_right_joint"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="100" joint="leg_right_joint"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="100" joint="foot_right_joint"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="100" joint="thigh_left_joint"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="100" joint="leg_left_joint"/>
+    <motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="100" joint="foot_left_joint"/>
+    <!-- <motor joint="finger2_rot" ctrlrange="-20.0 20.0" isctrllimited="true"/>-->
+  </actuator>
+</mujocoinclude>

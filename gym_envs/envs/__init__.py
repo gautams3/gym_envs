@@ -6,3 +6,4 @@ from gym_envs.envs.panda_reacher_env import PandaReachEnv
 from gym_envs.envs.panda_pick_place_env import PandaPickPlaceEnv
 from gym_envs.envs.humanoid import HumanoidSoftEnv
 from gym_envs.envs.laikago import LaikagoEnv
+from gym_envs.envs.walker2d import Walker2dObstacleEnv
