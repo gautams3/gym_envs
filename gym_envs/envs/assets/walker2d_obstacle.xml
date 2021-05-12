@@ -1,26 +1,25 @@
-<mujoco model="walker_2d_simple">
-  <compiler angle="degree" coordinate="global" inertiafromgeom="true"/>
-  <default>
-    <joint armature="0.01" damping=".1" limited="true"/>
-    <geom conaffinity="0" condim="3" contype="1" density="1000" friction=".7 .1 .1" rgba="0.8 0.6 .4 1"/>
-  </default>
-  <option integrator="RK4" timestep="0.002"/>
-  <asset>
-    <texture type="skybox" builtin="gradient" rgb1=".4 .5 .6" rgb2="0 0 0" width="100" height="100"/>
-    <texture builtin="flat" height="1278" mark="cross" markrgb="1 1 1" name="texgeom" random="0.01" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" type="cube" width="127"/>
-    <texture builtin="checker" height="100" name="texplane" rgb1="0 0 0" rgb2="0.8 0.8 0.8" type="2d" width="100"/>
-    <material name="MatPlane" reflectance="0.2" shininess="1" specular="1" texrepeat="60 60" texture="texplane"/>
-    <material name="geom" texture="texgeom" texuniform="true"/>
-  </asset>
-
-  <worldbody>
-    <include file="walker2d/walker2d.xml"/>
-    <body name="step0" pos="0.8 0 -0.5">
-      <inertial pos="0 0 0" mass="1200" diaginertia="500 136 436" />
-      <geom size="0.3 1 0.5" type="box" pos="0.8 0 -0.5" conaffinity="1" rgba="0.7 0 0 1" />
-    </body>
-  </worldbody>
-
-  <include file="walker2d/walker2d_actuator.xml"/>
-
+<mujoco model="walker_2d">
+    <compiler angle="radian" />
+    <option integrator="RK4" />
+    <size nconmax="100" njmax="500" />
+    <default class="main">
+        <joint armature="0.01" damping="0.1" limited="true" />
+        <geom conaffinity="0" friction="0.7 0.1 0.1" rgba="0.8 0.6 0.4 1" />
+    </default>
+    <asset>
+        <texture builtin="gradient" height="600" rgb1="0.4 0.5 0.6" rgb2="0 0 0" type="skybox" width="100" />
+        <texture builtin="flat" height="762" mark="cross" markrgb="1 1 1" name="texgeom" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" type="cube" width="127" />
+        <texture builtin="checker" height="100" name="texplane" rgb1="0 0 0" rgb2="0.8 0.8 0.8" type="2d" width="100" />
+        <material name="MatPlane" reflectance="0.2" shininess="1" specular="1" texrepeat="60 60" texture="texplane" />
+        <material name="geom" texture="texgeom" texuniform="true" />
+    </asset>
+    <worldbody>
+        <geom conaffinity="1" material="MatPlane" name="floor" rgba="0.8 0.9 0.8 1" size="40 40 40" type="plane" />
+        <light cutoff="100" diffuse="1 1 1" dir="0 0 -1" directional="true" exponent="1" pos="0 0 1.3" specular="0.1 0.1 0.1" />
+        <include file="walker2d/walker2d.xml"/>
+        <body name="step0" pos="0.8 0 0.0">
+            <geom conaffinity="1" pos="0 0 -0.5" rgba="0.7 0 0 1" size="0.3 1 0.5" type="box" />
+        </body>
+    </worldbody>
+    <include file="walker2d/walker2d_actuator.xml"/>
 </mujoco>
