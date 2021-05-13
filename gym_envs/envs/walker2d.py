@@ -36,6 +36,8 @@ class Walker2dObstacleEnv(Walker2dEnv):
     self._exclude_current_positions_from_observation = (exclude_current_positions_from_observation)
 
     MujocoEnv.__init__(self, xml_path, frame_skip)
+    self.init_qpos = self.sim.model.key_qpos[0]
+    self.init_qvel = self.sim.model.key_qvel[0]
 
   def step(self, action, output=True):
     x_position_before = self.sim.data.qpos[0]

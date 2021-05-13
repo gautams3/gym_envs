@@ -5,7 +5,7 @@
     <default class="main">
       <!-- Disable warmstart if your dynamics computations are random states. 
       Enable if your dynamics computations will form a full trajectory -->
-        <joint armature="0.01" damping="0.1" limited="true" />
+        <joint armature="1" stiffness = "15" damping="1" limited="true" />
         <geom conaffinity="0" friction="0.7 0.1 0.1" rgba="0.8 0.6 0.4 1" />
     </default>
     <asset>
@@ -24,4 +24,11 @@
         </body>
     </worldbody>
     <include file="walker2d/walker2d_actuator.xml"/>
+    <keyframe>
+      <!-- <key qpos='0 1.22 0 0.3768 -0.69377 0.141372 -0.5338 0 0.31416'/> -->
+      <!-- <key qpos='0 1.22 -0.15708 0.3768 -0.69377 0.141372 -0.5338 0 0.31416'/> -->
+      <!-- <key qpos='0 1.22 -0.15708 0.3768 -0.69377 0.141372 -0.5338 0 0.369138'/> -->
+      <!-- <key qpos='-0.0138071 1.18886 -0.118397 0.390971 -0.605557 0.0974864 -0.419578 -0.0983474 0.399588'/> -->
+      <key qpos='-0.123719 1.19877 -0.11777 0.206598 8.73749e-05 -0.240887 -0.146861 -0.419388 0.448905'/> <!--semi stable stand-->
+    </keyframe>
 </mujoco>
