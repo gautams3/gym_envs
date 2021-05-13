@@ -3,6 +3,8 @@
     <option integrator="RK4" />
     <size nconmax="100" njmax="500" />
     <default class="main">
+      <!-- Disable warmstart if your dynamics computations are random states. 
+      Enable if your dynamics computations will form a full trajectory -->
         <joint armature="0.01" damping="0.1" limited="true" />
         <geom conaffinity="0" friction="0.7 0.1 0.1" rgba="0.8 0.6 0.4 1" />
     </default>

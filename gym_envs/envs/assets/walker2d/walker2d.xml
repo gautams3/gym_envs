@@ -1,3 +1,30 @@
+<!-- TODO: Update for Walker Model
+  The state space is populated with joints in the order that they are
+  defined in this file. The actuators also operate on joints.
+  State-Space (name/joint/parameter):
+    - rootx                slider     position (m)
+    - rootz                slider     position (m)
+    - rooty                hinge      angle (rad)
+    - thigh_right_joint    hinge      angle (rad)
+    - leg_right_joint      hinge      angle (rad)
+    - foot_right_joint     hinge      angle (rad)
+    - thigh_left_joint     hinge      angle (rad)
+    - leg_left_joint       hinge      angle (rad)
+    - foot_right_joint     hinge      angle (rad)
+    - rootx                slider     velocity (m/s)
+    - rootz                slider     velocity (m/s)
+    - rooty                hinge      angular velocity (rad/s)
+    - thigh_right_joint    hinge      angular velocity (rad/s)
+  - leg_right_joint        hinge      angular velocity (rad/s)
+    - foot_right_joint     hinge      angular velocity (rad/s)
+    - thigh_left_joint     hinge      angular velocity (rad/s)
+    - leg_left_joint       hinge      angular velocity (rad/s)
+    - foot_right_joint     hinge      angular velocity (rad/s)
+  Params changed from gym's version of the model
+  ** target: added a target visual body to show the goal location
+  ** torso position
+  init z of torso changed to put it on the ground at the first step
+-->
 <mujocoinclude>
   <body name="torso" pos="0 0 1.21">
     <joint armature="0" axis="1 0 0" damping="0" limited="false" name="rootx" pos="0 0 -1.25" type="slide" />
@@ -6,7 +33,7 @@
     <geom friction="0.9 0.1 0.1" name="torso_geom" size="0.05 0.2" type="capsule" />
     <camera mode="trackcom" name="track" pos="0 -3 -0.25" quat="0.707107 0.707107 0 0" />
     <body name="thigh_right" pos="0 0 -0.2">
-      <joint axis="0 -1 0" name="thigh_right_joint" pos="0 0 0" range="-2.61799 0" />
+      <joint axis="0 -1 0" name="thigh_right_joint" pos="0 0 0" range="-1.57 1.57" />
       <geom friction="0.9 0.1 0.1" name="thigh_geom" pos="0 0 -0.225" size="0.05 0.225" type="capsule" />
       <body name="leg_right" pos="0 0 -0.7">
           <joint axis="0 -1 0" name="leg_right_joint" pos="0 0 0.25" range="-2.61799 0" />
@@ -18,7 +45,7 @@
       </body>
     </body>
     <body name="thigh_left" pos="0 0 -0.2">
-      <joint axis="0 -1 0" name="thigh_left_joint" pos="0 0 0" range="-2.61799 0" />
+      <joint axis="0 -1 0" name="thigh_left_joint" pos="0 0 0" range="-1.57 1.57" />
       <geom friction="0.9 0.1 0.1" name="thigh_left_geom" pos="0 0 -0.225" rgba="0.7 0.3 0.6 1" size="0.05 0.225" type="capsule" />
       <body name="leg_left" pos="0 0 -0.7">
         <joint axis="0 -1 0" name="leg_left_joint" pos="0 0 0.25" range="-2.61799 0" />
@@ -30,7 +57,7 @@
       </body>
     </body>
   </body>
-  <body name="gtorso" pos="1.5 0 1.21">
+  <body name="gtorso" pos="2.5 0 1.21">
     <geom friction="0.9 0.1 0.1" name="gtorso_geom" rgba="0 1 0 0.3" size="0.05 0.2" type="capsule" />
     <body name="gthigh_right" pos="-1 0 -0.2">
       <geom friction="0.9 0.1 0.1" name="gthigh_geom" pos="1 0 -0.225" rgba="0 1 0 0.3" size="0.05 0.225" type="capsule" />

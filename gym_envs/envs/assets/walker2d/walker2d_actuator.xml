@@ -1,4 +1,12 @@
 <mujocoinclude>
+  <!-- Actuators (name/actuator/parameter):
+    - thigh_right_joint    hinge       torque (N m)
+    - leg_right_joint      hinge       torque (N m)
+    - foot_right_joint     hinge       torque (N m)
+    - thigh_left_joint     hinge       torque (N m)
+    - leg_left_joint       hinge       torque (N m)
+    - foot_left_joint      hinge       torque (N m)
+  -->
   <actuator>
     <general ctrllimited="true" ctrlrange="-1 1" gear="100 0 0 0 0 0" joint="thigh_right_joint" name="thigh_right_joint_motor" />
     <general ctrllimited="true" ctrlrange="-1 1" gear="100 0 0 0 0 0" joint="leg_right_joint" name="leg_right_joint_motor" />
