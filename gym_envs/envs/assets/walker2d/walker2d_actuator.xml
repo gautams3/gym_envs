@@ -8,11 +8,11 @@
     - foot_left_joint      hinge       torque (N m)
   -->
   <actuator>
-    <general ctrllimited="true" ctrlrange="-1 1" gear="10 0 0 0 0 0" joint="thigh_right_joint" name="thigh_right_joint_motor" />
-    <general ctrllimited="true" ctrlrange="-1 1" gear="10 0 0 0 0 0" joint="leg_right_joint" name="leg_right_joint_motor" />
-    <general ctrllimited="true" ctrlrange="-1 1" gear="10 0 0 0 0 0" joint="foot_right_joint" name="foot_right_joint_motor" />
-    <general ctrllimited="true" ctrlrange="-1 1" gear="10 0 0 0 0 0" joint="thigh_left_joint" name="thigh_left_joint_motor" />
-    <general ctrllimited="true" ctrlrange="-1 1" gear="10 0 0 0 0 0" joint="leg_left_joint" name="leg_left_joint_motor" />
-    <general ctrllimited="true" ctrlrange="-1 1" gear="10 0 0 0 0 0" joint="foot_left_joint" name="foot_left_joint_motor" />
+    <general ctrllimited="true" ctrlrange="-1 1" gear="50 0 0 0 0 0" joint="thigh_right_joint" name="thigh_right_joint_motor" />
+    <general ctrllimited="true" ctrlrange="-1 1" gear="50 0 0 0 0 0" joint="leg_right_joint" name="leg_right_joint_motor" />
+    <general ctrllimited="true" ctrlrange="-1 1" gear="50 0 0 0 0 0" joint="foot_right_joint" name="foot_right_joint_motor" />
+    <general ctrllimited="true" ctrlrange="-1 1" gear="50 0 0 0 0 0" joint="thigh_left_joint" name="thigh_left_joint_motor" />
+    <general ctrllimited="true" ctrlrange="-1 1" gear="50 0 0 0 0 0" joint="leg_left_joint" name="leg_left_joint_motor" />
+    <general ctrllimited="true" ctrlrange="-1 1" gear="50 0 0 0 0 0" joint="foot_left_joint" name="foot_left_joint_motor" />
   </actuator>
 </mujocoinclude>

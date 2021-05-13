@@ -57,7 +57,7 @@
       </body>
     </body>
   </body>
-  <body name="gtorso" pos="2.5 0 1.21">
+  <body name="gtorso" pos="2.5 0 1.19877">
     <geom friction="0.9 0.1 0.1" name="gtorso_geom" rgba="0 1 0 0.3" size="0.05 0.2" type="capsule" />
     <body name="gthigh_right" pos="-1 0 -0.2">
       <geom friction="0.9 0.1 0.1" name="gthigh_geom" pos="1 0 -0.225" rgba="0 1 0 0.3" size="0.05 0.225" type="capsule" />
