@@ -37,10 +37,10 @@
       <geom friction="0.9 0.1 0.1" name="thigh_geom" pos="0 0 -0.225" size="0.05 0.225" type="capsule" />
       <body name="leg_right" pos="0 0 -0.7">
           <joint axis="0 -1 0" name="leg_right_joint" pos="0 0 0.25" range="-2.61799 0" />
-          <geom friction="0.9 0.1 0.1" name="leg_geom" size="0.04 0.25" type="capsule" />
+          <geom friction="0.9 0.1 0.1" name="leg_right_geom" size="0.04 0.25" type="capsule" />
           <body name="foot_right" pos="0.2 0 -0.35">
             <joint axis="0 -1 0" name="foot_right_joint" pos="-0.2 0 0.1" range="-0.785398 0.785398" />
-            <geom friction="0.9 0.1 0.1" name="foot_geom" pos="-0.1 0 0.1" quat="0.707107 0 -0.707107 0" size="0.06 0.1" type="capsule" />
+            <geom friction="0.9 0.1 0.1" name="foot_right_geom" pos="-0.1 0 0.1" quat="0.707107 0 -0.707107 0" size="0.06 0.1" type="capsule" />
           </body>
       </body>
     </body>
