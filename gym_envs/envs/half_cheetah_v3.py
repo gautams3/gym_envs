@@ -15,7 +15,7 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
               forward_reward_weight=1.0,
               ctrl_cost_weight=0.1,
               reset_noise_scale=0.,
-              exclude_current_positions_from_observation=True):
+              exclude_current_positions_from_observation=False):
     # Completely replacing parent init function, it doesn't let us choose frame_skip
     EzPickle.__init__(**locals())
     self._forward_reward_weight = forward_reward_weight
@@ -28,11 +28,13 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
       self._xml_path = os.path.join(curr_dir, 'assets', 'half_cheetah_soft.xml')
     else:
       self._xml_path = xml_path
+    self.goal_state = np.zeros(100) # dummy
     MujocoEnv.__init__(self, self._xml_path, frame_skip=frame_skip)
+    self.goal_state = np.hstack([self.init_qpos, self.init_qvel]).flatten()
+    self.goal_state[0] = self.sim.data.get_body_xpos('gtorso')[0]
 
   def step(self, action):
     x_position_before = self.sim.data.qpos[0]
-    contacts = self.sim.data.contact
     y_ori_before = self.sim.data.qpos[2]
     self.do_simulation(action, self.frame_skip)
     x_position_after = self.sim.data.qpos[0]
@@ -41,14 +43,21 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
     x_velocity = ((x_position_after - x_position_before)
                   / self.dt)
 
-    orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
+    # orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
 
     ctrl_cost = self.control_cost(action)
 
     forward_reward = self._forward_reward_weight * x_velocity
 
     observation = self._get_obs()
-    reward = forward_reward - ctrl_cost - orientation_cost
+
+    new_state = observation
+    if self._exclude_current_positions_from_observation:
+      new_state = np.hstack([x_position_after, observation])
+    distance_cost = (np.linalg.norm(new_state[:self.sim.model.nq] - self.goal_state[:self.sim.model.nq]))**2
+
+    # reward = forward_reward - ctrl_cost - orientation_cost
+    reward = -distance_cost
     done = False
     info = {
       'x_position': x_position_after,
