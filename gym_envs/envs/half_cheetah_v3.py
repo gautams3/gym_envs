@@ -43,7 +43,7 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
     x_velocity = ((x_position_after - x_position_before)
                   / self.dt)
 
-    # orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
+    orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
 
     ctrl_cost = self.control_cost(action)
 
@@ -56,8 +56,8 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
       new_state = np.hstack([x_position_after, observation])
     distance_cost = (np.linalg.norm(new_state[:self.sim.model.nq] - self.goal_state[:self.sim.model.nq]))**2
 
-    # reward = forward_reward - ctrl_cost - orientation_cost
-    reward = -distance_cost
+    reward = forward_reward - ctrl_cost - orientation_cost
+    # reward = -distance_cost
     done = False
     info = {
       'x_position': x_position_after,
