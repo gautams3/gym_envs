@@ -67,3 +67,6 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
     }
 
     return observation, reward, done, info
+
+  def get_obs(self):
+    return self._get_obs()
