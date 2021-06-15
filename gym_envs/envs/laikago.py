@@ -41,19 +41,19 @@ class LaikagoEnv(MujocoEnv, EzPickle):
     # Velocity
     x_after = curr_state[0]
     x_before = prev_state[0]
-    x_vel = (x_after - x_before)/(self.env.dt)
-    forward_reward = self.env.env._forward_reward_weight * x_vel
+    x_vel = (x_after - x_before)/(self.dt)
+    forward_reward = self._forward_reward_weight * x_vel
 
     # Orientation    
-    y_orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.env.dt)
-    x_orientation_cost = 1* np.abs(x_ori_after) + 0.5 * ((x_ori_after - x_ori_before)/self.env.dt)
-    z_orientation_cost = 1* np.abs(z_ori_after) + 0.5 * ((z_ori_after - z_ori_before)/self.env.dt)
+    y_orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
+    x_orientation_cost = 1* np.abs(x_ori_after) + 0.5 * ((x_ori_after - x_ori_before)/self.dt)
+    z_orientation_cost = 1* np.abs(z_ori_after) + 0.5 * ((z_ori_after - z_ori_before)/self.dt)
     orientation_cost = y_orientation_cost\
                       + 0.1 * x_orientation_cost\
                       + 0.1 * z_orientation_cost
 
     # Action
-    ctrl_cost = self.env.env._ctrl_cost_weight * np.sum(np.square(action))
+    ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
 
     # Total    
     reward = forward_reward - ctrl_cost - orientation_cost # from gym's half cheetah
