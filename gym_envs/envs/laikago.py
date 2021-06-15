@@ -2,6 +2,7 @@ import numpy as np
 from gym.utils import EzPickle
 from gym.envs.mujoco.mujoco_env import MujocoEnv
 import os
+from utils.misc import quat2rpy # get from mujoco
 
 DEFAULT_CAMERA_CONFIG = {'distance': 3.0, 'trackbodyid': 1, 'elevation': 0}
 
@@ -30,18 +31,43 @@ class LaikagoEnv(MujocoEnv, EzPickle):
   def step(self, action, output=True):
     if action.size == 6: # symmetric
       action = np.hstack([action, action])
-    self.do_simulation(action, self.frame_skip)
 
-    if output:
-      # Remove for performance boost
-      reward = 0
-      observation = self._get_obs()
-      done = False
-      info = {
-      }
-      return observation, reward, done, info
-    else:
-      return
+    prev_state = self._get_obs()
+    x_ori_before, y_ori_before, z_ori_before = quat2rpy(prev_state[3:7])
+    self.do_simulation(action, self.frame_skip)
+    curr_state = self._get_obs()
+    x_ori_after, y_ori_after, z_ori_after = quat2rpy(curr_state[3:7])
+
+    # Velocity
+    x_after = curr_state[0]
+    x_before = prev_state[0]
+    x_vel = (x_after - x_before)/(self.env.dt)
+    forward_reward = self.env.env._forward_reward_weight * x_vel
+
+    # Orientation    
+    y_orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.env.dt)
+    x_orientation_cost = 1* np.abs(x_ori_after) + 0.5 * ((x_ori_after - x_ori_before)/self.env.dt)
+    z_orientation_cost = 1* np.abs(z_ori_after) + 0.5 * ((z_ori_after - z_ori_before)/self.env.dt)
+    orientation_cost = y_orientation_cost\
+                      + 0.1 * x_orientation_cost\
+                      + 0.1 * z_orientation_cost
+
+    # Action
+    ctrl_cost = self.env.env._ctrl_cost_weight * np.sum(np.square(action))
+
+    # Total    
+    reward = forward_reward - ctrl_cost - orientation_cost # from gym's half cheetah
+
+    obs = curr_state
+    done = False
+    info = {
+      'x_position': x_after,
+      'x_velocity': x_vel,
+      'reward_run': forward_reward,
+      'reward_ctrl': -ctrl_cost,
+      'reward_orientation': -orientation_cost,
+    }
+    return obs, reward, done, info
 
 
   def _get_obs(self):
