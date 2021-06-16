@@ -98,3 +98,6 @@ class LaikagoEnv(MujocoEnv, EzPickle):
         getattr(self.viewer.cam, key)[:] = value
       else:
         setattr(self.viewer.cam, key, value)
+
+  def get_obs(self):
+    return self._get_obs()
