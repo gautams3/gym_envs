@@ -1,5 +1,6 @@
 <mujoco model="laikago">
     <compiler angle="radian" />
+    <option timestep="0.01" />
     <size njmax="500" nconmax="100" nkey="1" />
     <default class="main">
         <geom conaffinity="0" />
