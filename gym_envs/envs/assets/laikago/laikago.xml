@@ -30,7 +30,7 @@
             <camera name="track" pos="-3 0 0" quat="-0.707388 0 0.706825 0" mode="trackcom" />
             <body name="FL_hip" pos="0.0817145 0 0.242889">
                 <inertial pos="-0.0148759 0.000449378 0.000529985" quat="0.497831 0.516977 0.501529 0.483081" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
-                <joint name="FL_hipY" pos="0 0 0" axis="0 0 1" limited="true" stiffness="100" range="-0.385 0.385" damping="5" />
+                <joint name="FL_hipY" pos="0 0 0" axis="0 0 1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
                 <geom name="FL_hip_geom" type="mesh" rgba="1 0.423529 0.0392157 1" mesh="hipL" />
                 <body name="FL_thigh" pos="0.055855 0 0">
                     <inertial pos="0.00433942 -0.0522529 -0.0384912" quat="0.352291 0.58829 -0.677994 0.26482" mass="1.528" diaginertia="0.00651269 0.00646152 0.000741289" />
@@ -45,7 +45,7 @@
             </body>
             <body name="RL_hip" pos="0.0817145 0 -0.194401">
                 <inertial pos="-0.0148759 0.000449378 0.000529985" quat="0.497831 0.516977 0.501529 0.483081" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
-                <joint name="RL_hipY" pos="0 0 0" axis="0 0 1" limited="true" stiffness="100" range="-0.385 0.385" damping="5" />
+                <joint name="RL_hipY" pos="0 0 0" axis="0 0 1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
                 <geom name="RL_hip_geom" type="mesh" rgba="1 0.423529 0.0392157 1" mesh="hipL" />
                 <body name="RL_thigh" pos="0.055855 0 0">
                     <inertial pos="0.00433942 -0.0522529 -0.0384912" quat="0.352291 0.58829 -0.677994 0.26482" mass="1.528" diaginertia="0.00651269 0.00646152 0.000741289" />
@@ -60,7 +60,7 @@
             </body>
             <body name="FR_hip_motor" pos="-0.0817145 0 0.242889">
                 <inertial pos="0.0148759 0.000449378 0.000529985" quat="0.501529 0.483081 0.497831 0.516977" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
-                <joint name="FR_hipY" pos="0 0 0" axis="0 0 -1" limited="true" stiffness="100" range="-0.385 0.385" damping="5" />
+                <joint name="FR_hipY" pos="0 0 0" axis="0 0 -1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
                 <geom name="FR_hip_motor_geom" type="mesh" rgba="1 0.423529 0.0392157 1" mesh="hipR" />
                 <body name="FR_thigh" pos="-0.053565 0 0">
                     <inertial pos="-0.00417258 -0.0521245 -0.0384182" quat="0.263999 0.67598 -0.590566 0.352969" mass="1.528" diaginertia="0.00645581 0.00640599 0.000733923" />
@@ -75,7 +75,7 @@
             </body>
             <body name="RR_hip" pos="-0.0817145 0 -0.194401">
                 <inertial pos="0.0148759 0.000449378 0.000529985" quat="0.501529 0.483081 0.497831 0.516977" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
-                <joint name="RR_hipY" pos="0 0 0" axis="0 0 -1" limited="true" stiffness="100" range="-0.385 0.385" damping="5" />
+                <joint name="RR_hipY" pos="0 0 0" axis="0 0 -1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
                 <geom name="RR_hip_geom" type="mesh" rgba="1 0.423529 0.0392157 1" mesh="hipR" />
                 <body name="RR_thigh" pos="-0.053565 0 0">
                     <inertial pos="-0.00417258 -0.0521245 -0.0384182" quat="0.263999 0.67598 -0.590566 0.352969" mass="1.528" diaginertia="0.00645581 0.00640599 0.000733923" />
@@ -92,9 +92,9 @@
         <body name="gtorso" pos="3 0 0.413904" quat="0.5 0.5 0.5 0.5">
             <geom pos="0 0 0.043794" quat="0.707388 -0.706825 0 0" type="mesh" contype="0" rgba="0 1 0 0.3" mesh="torso" />
         </body>
-        <body name="step0" pos="1.5 0 -0.5">
+        <body name="step0" pos="2.5 0 0">
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom size="0.3 1 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step0_geom" size="0.3 1 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
     </worldbody>
     <actuator>
