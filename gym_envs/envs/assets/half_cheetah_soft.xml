@@ -121,7 +121,7 @@
       </body>
     </body>
     <body name="step0" pos="1.5 0 0">
-      <geom conaffinity="1" pos="0 0 -0.5" size="0.2 0.2 0.5" type="box"/>
+      <geom name="step0_geom" conaffinity="1" pos="0 0 -0.5" size="0.2 0.2 0.5" type="box"/>
     </body>
   </worldbody>
   <actuator>
