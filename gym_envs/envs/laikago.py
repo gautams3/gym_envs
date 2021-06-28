@@ -50,8 +50,8 @@ class LaikagoEnv(MujocoEnv, EzPickle):
       contact = self.sim.data.contact[c]
       if contact.dist == 0.0: # end of contacts
         break
-      if ('calf' not in self.env.sim.model.geom_id2name(contact.geom1)) and \
-          ('calf' not in self.env.sim.model.geom_id2name(contact.geom2)):
+      if ('calf' not in self.sim.model.geom_id2name(contact.geom1)) and \
+          ('calf' not in self.sim.model.geom_id2name(contact.geom2)):
         # print(f"Bad contact found between {self.env.sim.model.geom_id2name(contact.geom1)} and {self.env.sim.model.geom_id2name(contact.geom2)}")
         bad_contact_cost = self._bad_contact_cost
         break # skip checking other contacts
