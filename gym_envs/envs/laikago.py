@@ -2,7 +2,7 @@ import numpy as np
 from gym.utils import EzPickle
 from gym.envs.mujoco.mujoco_env import MujocoEnv
 import os
-from utils.misc import quat2rpy # get from mujoco
+from utils.misc import quat2rpy, quat_dist # get from mujoco
 
 DEFAULT_CAMERA_CONFIG = {'distance': 3.0, 'trackbodyid': 1, 'elevation': 0}
 
@@ -33,10 +33,8 @@ class LaikagoEnv(MujocoEnv, EzPickle):
       action = np.hstack([action, action])
 
     prev_state = self._get_obs()
-    x_ori_before, y_ori_before, z_ori_before = quat2rpy(prev_state[3:7])
     self.do_simulation(action, self.frame_skip)
     curr_state = self._get_obs()
-    x_ori_after, y_ori_after, z_ori_after = quat2rpy(curr_state[3:7])
 
     # Velocity
     x_after = curr_state[0]
@@ -45,12 +43,16 @@ class LaikagoEnv(MujocoEnv, EzPickle):
     forward_reward = self._forward_reward_weight * x_vel
 
     # Orientation    
-    y_orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
-    x_orientation_cost = 1* np.abs(x_ori_after) + 0.5 * ((x_ori_after - x_ori_before)/self.dt)
-    z_orientation_cost = 1* np.abs(z_ori_after) + 0.5 * ((z_ori_after - z_ori_before)/self.dt)
-    orientation_cost = y_orientation_cost\
-                      + 0.1 * x_orientation_cost\
-                      + 0.1 * z_orientation_cost
+    # x_ori_before, y_ori_before, z_ori_before = quat2rpy(prev_state[3:7])
+    # x_ori_after, y_ori_after, z_ori_after = quat2rpy(curr_state[3:7])
+    # y_orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
+    # x_orientation_cost = 1* np.abs(x_ori_after) + 0.5 * ((x_ori_after - x_ori_before)/self.dt)
+    # z_orientation_cost = 1* np.abs(z_ori_after) + 0.5 * ((z_ori_after - z_ori_before)/self.dt)
+    # orientation_cost = y_orientation_cost\
+    #                   + 0.1 * x_orientation_cost\
+    #                   + 0.1 * z_orientation_cost
+    orientation_cost = quat_dist(curr_state[3:7], np.array([0.5, 0.5, 0.5, 0.5]))
+
 
     # Action
     ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
