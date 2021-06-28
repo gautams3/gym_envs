@@ -12,11 +12,13 @@ class LaikagoEnv(MujocoEnv, EzPickle):
                frame_skip=5,
                forward_reward_weight=1.0,
                ctrl_cost_weight=0.1,
-               reset_noise_scale=0.):
+               reset_noise_scale=0.,
+               bad_contact_cost = 1.):
     EzPickle.__init__(**locals())
     self._forward_reward_weight = forward_reward_weight
     self._ctrl_cost_weight = ctrl_cost_weight
     self._reset_noise_scale = reset_noise_scale
+    self._bad_contact_cost = bad_contact_cost
 
     if xml_path is None:
       curr_dir = os.path.dirname(os.path.realpath(__file__))
@@ -42,6 +44,18 @@ class LaikagoEnv(MujocoEnv, EzPickle):
     x_vel = (x_after - x_before)/(self.dt)
     forward_reward = self._forward_reward_weight * x_vel
 
+    # Penalty for bad contacts
+    bad_contact_cost = 0 # default
+    for c in range(len(self.sim.data.contact)):
+      contact = self.sim.data.contact[c]
+      if contact.dist == 0.0: # end of contacts
+        break
+      if ('calf' not in self.env.sim.model.geom_id2name(contact.geom1)) and \
+          ('calf' not in self.env.sim.model.geom_id2name(contact.geom2)):
+        # print(f"Bad contact found between {self.env.sim.model.geom_id2name(contact.geom1)} and {self.env.sim.model.geom_id2name(contact.geom2)}")
+        bad_contact_cost = self._bad_contact_cost
+        break # skip checking other contacts
+
     # Orientation    
     # x_ori_before, y_ori_before, z_ori_before = quat2rpy(prev_state[3:7])
     # x_ori_after, y_ori_after, z_ori_after = quat2rpy(curr_state[3:7])
@@ -58,7 +72,7 @@ class LaikagoEnv(MujocoEnv, EzPickle):
     ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
 
     # Total    
-    reward = forward_reward - ctrl_cost - orientation_cost # from gym's half cheetah
+    reward = forward_reward - ctrl_cost - orientation_cost - bad_contact_cost # from gym's half cheetah
 
     obs = curr_state
     done = False
@@ -68,6 +82,7 @@ class LaikagoEnv(MujocoEnv, EzPickle):
       'reward_run': forward_reward,
       'reward_ctrl': -ctrl_cost,
       'reward_orientation': -orientation_cost,
+      'reward_bad_contact': -bad_contact_cost,
     }
     return obs, reward, done, info
 
