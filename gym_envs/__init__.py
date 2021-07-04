@@ -49,6 +49,13 @@ register(
 )
 
 register(
+    id='laikago-overlay-v0',
+    entry_point='gym_envs.envs:LaikagoOverlayEnv',
+    max_episode_steps=10000,
+)
+
+
+register(
     id='walker2d-obstacle-v0',
     entry_point='gym_envs.envs:Walker2dObstacleEnv',
     max_episode_steps=10000,

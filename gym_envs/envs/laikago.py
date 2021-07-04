@@ -56,7 +56,7 @@ class LaikagoEnv(MujocoEnv, EzPickle):
         bad_contact_cost = self._bad_contact_cost
         break # skip checking other contacts
 
-    # Orientation    
+    # Orientation
     # x_ori_before, y_ori_before, z_ori_before = quat2rpy(prev_state[3:7])
     # x_ori_after, y_ori_after, z_ori_after = quat2rpy(curr_state[3:7])
     # y_orientation_cost = 1* np.abs(y_ori_after) + 0.5 * ((y_ori_after - y_ori_before)/self.dt)
@@ -71,7 +71,7 @@ class LaikagoEnv(MujocoEnv, EzPickle):
     # Action
     ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
 
-    # Total    
+    # Total
     reward = forward_reward - ctrl_cost - orientation_cost - bad_contact_cost # from gym's half cheetah
 
     obs = curr_state
@@ -118,3 +118,51 @@ class LaikagoEnv(MujocoEnv, EzPickle):
 
   def get_obs(self):
     return self._get_obs()
+
+
+class LaikagoOverlayEnv(LaikagoEnv):
+  def __init__(self,
+               xml_path=None,
+               frame_skip=5,
+               forward_reward_weight=1.0,
+               ctrl_cost_weight=0.1,
+               reset_noise_scale=0.,
+               bad_contact_cost = 1.):
+    if xml_path is None:
+      curr_dir = os.path.dirname(os.path.realpath(__file__))
+      self._xml_path = os.path.join(curr_dir, 'assets', 'laikago', 'laikago_overlay.xml')
+    else:
+      self._xml_path = xml_path
+    super(LaikagoOverlayEnv, self).__init__(xml_path=self._xml_path, 
+                                            reset_noise_scale=reset_noise_scale, 
+                                            frame_skip=frame_skip,
+                                            forward_reward_weight=forward_reward_weight,
+                                            ctrl_cost_weight=ctrl_cost_weight,
+                                            bad_contact_cost=bad_contact_cost)
+
+  def step(self, action):
+    if action.size == 12: # symmetric
+      actpol = action[:6]
+      acttraj = action[6:]
+      action = np.hstack([actpol, actpol, acttraj, acttraj])
+
+    self.do_simulation(action, self.frame_skip)
+
+    reward = 0
+    obs = self._get_obs()
+    done = False
+    info = {
+      'x_position': 0,
+      'x_velocity': 0,
+      'reward_run': 0,
+      'reward_ctrl': 0,
+      'reward_orientation': 0,
+      'reward_bad_contact': 0,
+    }
+    return obs, reward, done, info
+
+  def _get_obs(self):
+    position = self.sim.data.qpos.flat.copy()[:19] # only for first LK
+    velocity = self.sim.data.qvel.flat.copy()[:18] # only for first LK
+    observation = np.concatenate((position, velocity)).ravel()
+    return observation
