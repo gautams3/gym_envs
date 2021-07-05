@@ -93,6 +93,9 @@
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
             <geom name="step0_geom" size="0.3 1 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
+        <body name="gtorso" pos="3 0 0.413904" quat="0.5 0.5 0.5 0.5">
+            <geom pos="0 0 0.043794" quat="0.707388 -0.706825 0 0" type="mesh" contype="0" conaffinity="0" rgba="0 1 0 0" mesh="torso" />
+        </body>
     </worldbody>
     <actuator>
         <general name="FL_hipY" joint="FL_hipY" gear="100 0 0 0 0 0" />
