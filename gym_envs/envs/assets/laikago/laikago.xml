@@ -10,8 +10,8 @@
     <asset>
         <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0 0 0" width="100" height="600" />
         <texture type="cube" name="texgeom" builtin="flat" mark="cross" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" width="127" height="762" />
-        <texture type="2d" name="texplane" builtin="checker" rgb1="1 1 1" rgb2="0.2 0.2 0.8" width="100" height="100" />
-        <material name="MatPlane" texture="texplane" texrepeat="60 60" specular="1" shininess="1" />
+        <texture type="2d" name="texplane" builtin="checker" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="100" height="100" />
+        <material name="MatPlane" texture="texplane" texrepeat="40 40" specular="1" shininess="1" />
         <material name="geom" texture="texgeom" texuniform="true" />
         <mesh name="torso" file="chassis.stl" />
         <mesh name="hipR" file="hipR.stl" />
