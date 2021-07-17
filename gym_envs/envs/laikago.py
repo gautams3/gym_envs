@@ -71,8 +71,13 @@ class LaikagoEnv(MujocoEnv, EzPickle):
     # Action
     ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
 
+    h_after = curr_state[2]
+    h_before = prev_state[2]
+    ht_cost = 0#0.02*np.abs(h_after - h_before)
+
+
     # Total
-    reward = forward_reward - ctrl_cost - orientation_cost - bad_contact_cost # from gym's half cheetah
+    reward = forward_reward - ht_cost - ctrl_cost - orientation_cost - bad_contact_cost # from gym's half cheetah
 
     obs = curr_state
     done = False
