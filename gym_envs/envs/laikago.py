@@ -13,7 +13,7 @@ class LaikagoEnv(MujocoEnv, EzPickle):
                forward_reward_weight=1.0,
                ctrl_cost_weight=0.1,
                reset_noise_scale=0.,
-               bad_contact_cost = 1.):
+               bad_contact_cost = 0.):
     EzPickle.__init__(**locals())
     self._forward_reward_weight = forward_reward_weight
     self._ctrl_cost_weight = ctrl_cost_weight
