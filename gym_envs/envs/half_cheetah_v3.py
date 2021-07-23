@@ -68,7 +68,8 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
       'reward_run': forward_reward,
       'reward_ctrl': -ctrl_cost,
       'reward_orientation': -orientation_cost,
-    }
+      'reward_bad_contact': 0,
+}
 
     return observation, reward, done, info
 
