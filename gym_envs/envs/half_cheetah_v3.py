@@ -32,6 +32,8 @@ class HalfCheetahSoftEnv(HalfCheetahEnv):
       self._xml_path = xml_path
     self.goal_state = np.zeros(100) # dummy
     MujocoEnv.__init__(self, self._xml_path, frame_skip=frame_skip)
+    self.init_qpos = self.sim.model.key_qpos[0]
+    self.init_qvel = self.sim.model.key_qvel[0]
     self.goal_state = np.hstack([self.init_qpos, self.init_qvel]).flatten()
     self.goal_state[0] = self.sim.data.get_body_xpos('gtorso')[0]
 
