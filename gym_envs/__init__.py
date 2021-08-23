@@ -25,6 +25,12 @@ register(
 )
 
 register(
+    id='half-cheetah-overlay-v0',
+    entry_point='gym_envs.envs:HalfCheetahOverlayEnv',
+    max_episode_steps=100,
+)
+
+register(
     id='panda-reacher-v0',
     entry_point='gym_envs.envs:PandaReachEnv',
     max_episode_steps=1000,
