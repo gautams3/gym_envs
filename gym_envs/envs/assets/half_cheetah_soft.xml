@@ -98,7 +98,7 @@
       </body>
     </body>
     <!-- Target. All names prefixed with g for goal -->
-    <body name="gtorso" pos="3 0 0.587">
+    <body name="gtorso" pos="0 0 0.587">
       <geom contype="0" name="gtorso" quat="0.707107 0 -0.707107 0" rgba="0 1 0 0.3" size="0.046 0.5" type="capsule"/>
       <geom contype="0" name="ghead" pos="0.6 0 0.1" quat="0.90687 0 0.42141 0" rgba="0 1 0 0.3" size="0.046 0.15" type="capsule"/>
       <body name="gbthigh" pos="-0.5 0 0">
