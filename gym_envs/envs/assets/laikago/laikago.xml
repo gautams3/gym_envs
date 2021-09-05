@@ -1,9 +1,13 @@
+<?xml version="1.0" ?>
 <mujoco model="laikago">
     <compiler angle="radian" />
-    <option timestep="0.01" />
-    <size njmax="500" nconmax="100" nkey="1" />
+    <option timestep="0.01">
+      <!-- Disable if your dynamics computations are random states. Enable if your dynamics computations will form a full trajectory-->
+      <flag warmstart="disable"/>
+    </option>
+    <size njmax="500" nconmax="100" nkey="1" nstack="300000" nuser_geom="1"/>
     <default class="main">
-        <geom conaffinity="0" contype="1" />
+        <geom conaffinity="0"/>
         <general ctrllimited="true" ctrlrange="-1 1" />
         <joint armature="0.1" />
     </default>
