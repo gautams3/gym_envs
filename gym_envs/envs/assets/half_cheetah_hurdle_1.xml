@@ -1,0 +1,148 @@
+<!-- Cheetah Model
+  The state space is populated with joints in the order that they are
+  defined in this file. The actuators also operate on joints.
+  State-Space (name/joint/parameter):
+    - rootx     slider      position (m)
+    - rootz     slider      position (m)
+    - rooty     hinge       angle (rad)
+    - bthigh    hinge       angle (rad)
+    - bshin     hinge       angle (rad)
+    - bfoot     hinge       angle (rad)
+    - fthigh    hinge       angle (rad)
+    - fshin     hinge       angle (rad)
+    - ffoot     hinge       angle (rad)
+    - rootx     slider      velocity (m/s)
+    - rootz     slider      velocity (m/s)
+    - rooty     hinge       angular velocity (rad/s)
+    - bthigh    hinge       angular velocity (rad/s)
+    - bshin     hinge       angular velocity (rad/s)
+    - bfoot     hinge       angular velocity (rad/s)
+    - fthigh    hinge       angular velocity (rad/s)
+    - fshin     hinge       angular velocity (rad/s)
+    - ffoot     hinge       angular velocity (rad/s)
+  Actuators (name/actuator/parameter):
+    - bthigh    hinge       torque (N m)
+    - bshin     hinge       torque (N m)
+    - bfoot     hinge       torque (N m)
+    - fthigh    hinge       torque (N m)
+    - fshin     hinge       torque (N m)
+    - ffoot     hinge       torque (N m)
+  Params changed from gym's HalfCheetah model
+  ** soft contacts (http://www.mujoco.org/forum/index.php?threads/contact-model.3942/)
+  Solver Params: http://www.mujoco.org/book/modeling.html#CSolver
+  solref="-stiffness -damping" (actual stiffness and damping are scaled by 'dmax' in solimp)
+  solimp = "default dmax default"
+  ** reflections
+  reflectance="value"
+  ** target: added a target visual body to show the goal location
+  ** torso position
+  init z of torso changed to put it on the ground at the first step
+  ** warmstart
+  Disable if your dynamics computations are random states. Enable if your dynamics computations will form a full trajectory
+-->
+<?xml version="1.0" ?>
+<mujoco model="cheetah">
+  <compiler angle="radian"/>
+  <option timestep="0.01">
+    <!-- Disable if your dynamics computations are random states. Enable if your dynamics computations will form a full trajectory-->
+    <flag warmstart="disable"/>
+  </option>
+  <size nconmax="100" njmax="500" nkey="1" nstack="300000" nuser_geom="1"/>
+  <default class="main">
+    <joint armature="0.1" damping="0.01" limited="true" solimplimit="0 0.8 0.03 0.5 2" stiffness="8"/>
+    <geom conaffinity="0" friction="0.4 0.1 0.1" rgba="0.8 0.6 0.4 1" solimp="0 0.8 0.01 0.5 2"/>
+    <!-- <geom conaffinity="0" condim="3" contype="1" friction=".4 .1 .1" rgba="0.8 0.6 .4 1" solimp="0.0 1 0.01" solref="-100 -10"/> -->
+    <general ctrllimited="true" ctrlrange="-1 1"/>
+  </default>
+  <asset>
+    <texture builtin="gradient" height="600" rgb1="1 1 1" rgb2="0 0 0" type="skybox" width="100"/>
+    <texture builtin="flat" height="762" mark="cross" markrgb="1 1 1" name="texgeom" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" type="cube" width="127"/>
+    <texture type="2d" name="texplane" builtin="checker" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="100" height="100"/>
+    <material name="MatPlane" shininess="1" specular="1" texrepeat="40 40" texture="texplane"/>
+    <material name="geom" texture="texgeom" texuniform="true"/>
+  </asset>
+  <worldbody>
+    <geom conaffinity="1" material="MatPlane" name="floor" rgba="0.8 0.9 0.8 1" size="40 40 40" type="plane"/>
+    <light cutoff="100" diffuse="1 1 1" dir="0 0 -1" directional="true" exponent="1" pos="0 0 1.3" specular="0.1 0.1 0.1"/>
+    <body name="torso" pos="0 0 0.587">
+      <joint armature="0" axis="1 0 0" damping="0" limited="false" name="rootx" pos="0 0 0" stiffness="0" type="slide"/>
+      <joint armature="0" axis="0 0 1" damping="0" limited="false" name="rootz" pos="0 0 0" stiffness="0" type="slide"/>
+      <joint armature="0" axis="0 1 0" damping="0" limited="false" name="rooty" pos="0 0 0" stiffness="0"/>
+      <geom name="torso" quat="0.707107 0 -0.707107 0" size="0.046 0.5" type="capsule"/>
+      <geom name="head" pos="0.6 0 0.1" quat="0.90687 0 0.42141 0" size="0.046 0.15" type="capsule"/>
+      <camera mode="trackcom" name="track" pos="0 -3 0.3" quat="0.707107 0.707107 0 0"/>
+      <!-- <site name='tip'  pos='.15 0 .11'/>-->
+      <body name="bthigh" pos="-0.5 0 0">
+        <joint axis="0 1 0" damping="6" name="bthigh" pos="0 0 0" range="-0.52 1.05" stiffness="240"/>
+        <geom name="bthigh" pos="0.1 0 -0.13" quat="-0.32329 0 -0.9463 0" size="0.046 0.145" type="capsule"/>
+        <body name="bshin" pos="0.16 0 -0.25">
+          <joint axis="0 1 0" damping="4.5" name="bshin" pos="0 0 0" range="-0.785 0.785" stiffness="180"/>
+          <geom name="bshin" pos="-0.14 0 -0.07" quat="0.52762 0 -0.849481 0" rgba="0.9 0.6 0.6 1" size="0.046 0.15" type="capsule"/>
+          <body name="bfoot" pos="-0.28 0 -0.14">
+            <joint axis="0 1 0" damping="3" name="bfoot" pos="0 0 0" range="-0.4 0.785" stiffness="120"/>
+            <geom name="bfoot" pos="0.03 0 -0.097" quat="0.990901 0 -0.13459 0" rgba="0.9 0.6 0.6 1" size="0.046 0.094" type="capsule"/>
+          </body>
+        </body>
+      </body>
+      <body name="fthigh" pos="0.5 0 0">
+        <joint axis="0 1 0" damping="4.5" name="fthigh" pos="0 0 0" range="-1 0.7" stiffness="180"/>
+        <geom name="fthigh" pos="-0.07 0 -0.12" quat="0.96639 0 0.257081 0" size="0.046 0.133" type="capsule"/>
+        <body name="fshin" pos="-0.14 0 -0.24">
+          <joint axis="0 1 0" damping="3" name="fshin" pos="0 0 0" range="-1.2 0.87" stiffness="120"/>
+          <geom name="fshin" pos="0.065 0 -0.09" quat="0.955337 0 -0.29552 0" rgba="0.9 0.6 0.6 1" size="0.046 0.106" type="capsule"/>
+          <body name="ffoot" pos="0.13 0 -0.18">
+            <joint axis="0 1 0" damping="1.5" name="ffoot" pos="0 0 0" range="-0.5 0.5" stiffness="60"/>
+            <geom name="ffoot" pos="0.045 0 -0.07" quat="0.955337 0 -0.29552 0" rgba="0.9 0.6 0.6 1" size="0.046 0.07" type="capsule"/>
+          </body>
+        </body>
+      </body>
+    </body>
+    <!-- Target. All names prefixed with g for goal -->
+    <body name="gtorso" pos="0 0 0.587">
+      <geom contype="0" name="gtorso" quat="0.707107 0 -0.707107 0" rgba="0 1 0 0.3" size="0.046 0.5" type="capsule"/>
+      <geom contype="0" name="ghead" pos="0.6 0 0.1" quat="0.90687 0 0.42141 0" rgba="0 1 0 0.3" size="0.046 0.15" type="capsule"/>
+      <body name="gbthigh" pos="-0.5 0 0">
+        <geom contype="0" name="gbthigh" pos="0.1 0 -0.13" quat="-0.32329 0 -0.9463 0" rgba="0 1 0 0.3" size="0.046 0.145" type="capsule"/>
+        <body name="gbshin" pos="0.16 0 -0.25">
+          <geom contype="0" name="gbshin" pos="-0.14 0 -0.07" quat="0.52762 0 -0.849481 0" rgba="0 1 0 0.3" size="0.046 0.15" type="capsule"/>
+          <body name="gbfoot" pos="-0.28 0 -0.14">
+            <geom contype="0" name="gbfoot" pos="0.03 0 -0.097" quat="0.990901 0 -0.13459 0" rgba="0 1 0 0.3" size="0.046 0.094" type="capsule"/>
+          </body>
+        </body>
+      </body>
+      <body name="gfthigh" pos="0.5 0 0">
+        <geom contype="0" name="gfthigh" pos="-0.07 0 -0.12" quat="0.96639 0 0.257081 0" rgba="0 1 0 0.3" size="0.046 0.133" type="capsule"/>
+        <body name="gfshin" pos="-0.14 0 -0.24">
+          <geom contype="0" name="gfshin" pos="0.065 0 -0.09" quat="0.955337 0 -0.29552 0" rgba="0 1 0 0.3" size="0.046 0.106" type="capsule"/>
+          <body name="gffoot" pos="0.13 0 -0.18">
+            <geom contype="0" name="gffoot" pos="0.045 0 -0.07" quat="0.955337 0 -0.29552 0" rgba="0 1 0 0.3" size="0.046 0.07" type="capsule"/>
+          </body>
+        </body>
+      </body>
+    </body>
+    <!-- <body name="stepl" pos="-7 0 0.8">
+      <geom name="stepl_geom" conaffinity="1" pos="0 0 -0.5" size="9 0.2 0.5" type="box"/>
+    </body>
+    <body name="step0" pos="8 0 0.8">
+      <geom name="step0_geom" conaffinity="1" pos="0 0 -0.5" size="6 0.2 0.5" rgba=".8 .2 .1 1" type="box"/>
+    </body>
+    <body name="stepr" pos="22 0 0.8">
+      <geom name="stepr_geom" conaffinity="1" pos="0 0 -0.5" size="8 0.2 0.5" type="box"/>
+    </body>       -->
+    <body name="step0" pos="2.3 0 0">
+      <geom name="step0_geom" conaffinity="1" pos="0 0 -0.5" size="0.3 0.2 0.5" type="box"/>
+    </body>
+  </worldbody>
+  <actuator>
+    <general gear="120 0 0 0 0 0" joint="bthigh" name="bthigh"/>
+    <general gear="90 0 0 0 0 0" joint="bshin" name="bshin"/>
+    <general gear="60 0 0 0 0 0" joint="bfoot" name="bfoot"/>
+    <general gear="120 0 0 0 0 0" joint="fthigh" name="fthigh"/>
+    <general gear="60 0 0 0 0 0" joint="fshin" name="fshin"/>
+    <general gear="30 0 0 0 0 0" joint="ffoot" name="ffoot"/>
+  </actuator>
+  <keyframe>
+    <key qpos="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0" qvel="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0" time="0.0"/>
+    <!-- <key qpos='0 0.350022 0.0728913 0.0622312 0.113 -0.00601205 -0.105105 -0.229571 -0.218544' qvel="0 0 0 0 0 0 0 0 0" time="0"/> --> <!-- Step down task -->
+  </keyframe>
+</mujoco>
