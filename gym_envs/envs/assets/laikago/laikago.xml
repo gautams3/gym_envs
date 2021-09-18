@@ -94,13 +94,14 @@
             </body>
         </body>
         <body name="stepl" pos="-7 0 0.8">
-        <geom name="stepl_geom" conaffinity="1" pos="0 0 -0.5" size="9 10 0.5" type="box"/>
+        <geom name="stepl_geom" conaffinity="1" pos="0 0 -0.5" size="9 2 0.5" rgba=".0 .0 1 1" type="box"/>
         </body>
         <body name="step0" pos="8 0 0.8">
-        <geom name="step0_geom" conaffinity="1" pos="0 0 -0.5" size="6 10 0.5" rgba=".8 .2 .1 1" type="box"/>
+        <camera name="step_track" pos="-6 -7 0" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
+        <geom name="step0_geom" conaffinity="1" pos="0 0 -0.5" size="6 2 0.5" rgba=".8 .2 .1 1" type="box"/>
         </body>
         <body name="stepr" pos="22 0 0.8">
-        <geom name="stepr_geom" conaffinity="1" pos="0 0 -0.5" size="8 10 0.5" type="box"/>
+        <geom name="stepr_geom" conaffinity="1" pos="0 0 -0.5" size="8 2 0.5" rgba=".0 .0 1 1" type="box"/>
         </body>     
         <!-- <body name="step0" pos="2.3 0 0">
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
