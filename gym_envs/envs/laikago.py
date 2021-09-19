@@ -145,26 +145,27 @@ class LaikagoOverlayEnv(LaikagoEnv):
                                             ctrl_cost_weight=ctrl_cost_weight,
                                             bad_contact_cost=bad_contact_cost)
 
-  def step(self, action):
-    if action.size == 12: # symmetric
-      actpol = action[:6]
-      acttraj = action[6:]
-      action = np.hstack([actpol, actpol, acttraj, acttraj])
+  ### NOT NEEDED. We only give actions to main LK, not overlay LK
+  # def step(self, action):
+  #   if action.size == 12: # symmetric
+  #     actpol = action[:6]
+  #     acttraj = action[6:]
+  #     action = np.hstack([actpol, actpol, acttraj, acttraj])
 
-    self.do_simulation(action, self.frame_skip)
+  #   self.do_simulation(action, self.frame_skip)
 
-    reward = 0
-    obs = self._get_obs()
-    done = False
-    info = {
-      'x_position': 0,
-      'x_velocity': 0,
-      'reward_run': 0,
-      'reward_ctrl': 0,
-      'reward_orientation': 0,
-      'reward_bad_contact': 0,
-    }
-    return obs, reward, done, info
+  #   reward = 0
+  #   obs = self._get_obs()
+  #   done = False
+  #   info = {
+  #     'x_position': 0,
+  #     'x_velocity': 0,
+  #     'reward_run': 0,
+  #     'reward_ctrl': 0,
+  #     'reward_orientation': 0,
+  #     'reward_bad_contact': 0,
+  #   }
+  #   return obs, reward, done, info
 
   def _get_obs(self):
     position = self.sim.data.qpos.flat.copy()[:19] # only for first LK
