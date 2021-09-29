@@ -11,6 +11,15 @@
         <general ctrllimited="true" ctrlrange="-1 1" />
         <joint armature="0.1" />
     </default>
+    <default class="ground"> <!-- Cannot seem to use this class-->
+        <geom conaffinity="3" contype="0" />
+    </default>
+    <default class="overlay">
+        <geom conaffinity="0" contype="2" rgba="1 0.3 1 0.5"/>
+        <general ctrllimited="true" ctrlrange="-1 1"/>
+        <joint armature="0.1" />
+    </default>
+
     <asset>
         <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0 0 0" width="100" height="600" />
         <texture type="cube" name="texgeom" builtin="flat" mark="cross" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" width="127" height="762" />
@@ -25,8 +34,9 @@
         <mesh name="thighL" file="thighL.stl" />
     </asset>
     <worldbody>
-        <geom name="floor" size="40 40 40" type="plane" conaffinity="1" material="MatPlane" rgba="0.8 0.8 0.8 1" />
+        <geom name="floor" size="40 40 40" type="plane" conaffinity="3" contype = "0" material="MatPlane" rgba="0.8 0.8 0.8 1" />
         <light pos="0 0 1.3" dir="0 0 -1" directional="true" castshadow="false" cutoff="100" exponent="1" diffuse="1 1 1" specular="0.1 0.1 0.1" />
+        <!-- MAIN LAIKAGO -->
         <body name="torso" pos="0 0 1.25" quat="0.5 0.5 0.5 0.5">
             <inertial pos="4.16858e-05 0.0239872 0.033105" quat="0.714924 -0.000262058 0.00241985 0.699198" mass="13.733" diaginertia="0.3781 0.364074 0.0628623" />
             <joint name="root" type="free" />
@@ -93,21 +103,90 @@
                 </body>
             </body>
         </body>
+
+        <!-- OVERLAY LAIKAGO -->
+        <body name="otorso" pos="0.2 0 1.25" quat="0.5 0.5 0.5 0.5">
+            <inertial pos="4.16858e-05 0.0239872 0.033105" quat="0.714924 -0.000262058 0.00241985 0.699198" mass="13.733" diaginertia="0.3781 0.364074 0.0628623" />
+            <joint name="oroot" type="free" />
+            <geom name="otorso_geom" class="overlay" pos="0 0 0.043794" quat="0.707388 -0.706825 0 0" type="mesh" mesh="torso" />
+            <camera name="otrack" pos="-3 0 0" quat="-0.707388 0 0.706825 0" mode="trackcom" />
+            <body name="oFL_hip" pos="0.0817145 0 0.242889">
+                <inertial pos="-0.0148759 0.000449378 0.000529985" quat="0.497831 0.516977 0.501529 0.483081" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
+                <joint name="oFL_hipY" pos="0 0 0" axis="0 0 1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
+                <geom name="oFL_hip_geom" class="overlay" type="mesh" mesh="hipL" />
+                <body name="oFL_thigh" pos="0.055855 0 0">
+                    <inertial pos="0.00433942 -0.0522529 -0.0384912" quat="0.352291 0.58829 -0.677994 0.26482" mass="1.528" diaginertia="0.00651269 0.00646152 0.000741289" />
+                    <joint name="oFL_hipX" pos="0 0 0" axis="1 0 0" limited="true" stiffness="100" range="-1.2 0.7" damping="5" />
+                    <geom name="oFL_thigh_geom" class="overlay" type="mesh" mesh="thighL" />
+                    <body name="oFL_calf" pos="-0.02069 -0.20833 -0.1422">
+                        <inertial pos="3.85741e-05 -0.150291 -0.0150309" quat="0.681092 0.732194 -0.00185835 0.00160362" mass="0.301" diaginertia="0.00247327 0.00245992 3.78788e-05" />
+                        <joint name="oFL_knee" pos="0 0 0" axis="1 0 0" springref="-0.7" limited="true" stiffness="100" range="-1.57 0.8" damping="5" />
+                        <geom name="oFL_calf_geom" class="overlay" quat="0.707109 0 0.707105 0" type="mesh" mesh="calf" />
+                    </body>
+                </body>
+            </body>
+            <body name="oRL_hip" pos="0.0817145 0 -0.194401">
+                <inertial pos="-0.0148759 0.000449378 0.000529985" quat="0.497831 0.516977 0.501529 0.483081" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
+                <joint name="oRL_hipY" pos="0 0 0" axis="0 0 1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
+                <geom name="oRL_hip_geom" class="overlay" type="mesh" mesh="hipL" />
+                <body name="oRL_thigh" pos="0.055855 0 0">
+                    <inertial pos="0.00433942 -0.0522529 -0.0384912" quat="0.352291 0.58829 -0.677994 0.26482" mass="1.528" diaginertia="0.00651269 0.00646152 0.000741289" />
+                    <joint name="oRL_hipX" pos="0 0 0" axis="1 0 0" limited="true" stiffness="100" range="-0.7 0.7" damping="5" />
+                    <geom name="oRL_thigh_geom" class="overlay" type="mesh" mesh="thighL" />
+                    <body name="oRL_calf" pos="-0.02069 -0.20833 -0.1422">
+                        <inertial pos="3.85741e-05 -0.150291 -0.0150309" quat="0.681092 0.732194 -0.00185835 0.00160362" mass="0.301" diaginertia="0.00247327 0.00245992 3.78788e-05" />
+                        <joint name="oRL_knee" pos="0 0 0" axis="1 0 0" springref="-0.7" limited="true" stiffness="100" range="-1.57 0.8" damping="5" />
+                        <geom name="oRL_calf_geom" class="overlay" quat="0.707109 0 0.707105 0" type="mesh" mesh="calf" />
+                    </body>
+                </body>
+            </body>
+            <body name="oFR_hip_motor" pos="-0.0817145 0 0.242889">
+                <inertial pos="0.0148759 0.000449378 0.000529985" quat="0.501529 0.483081 0.497831 0.516977" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
+                <joint name="oFR_hipY" pos="0 0 0" axis="0 0 -1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
+                <geom name="oFR_hip_motor_geom" class="overlay" type="mesh" mesh="hipR" />
+                <body name="oFR_thigh" pos="-0.053565 0 0">
+                    <inertial pos="-0.00417258 -0.0521245 -0.0384182" quat="0.263999 0.67598 -0.590566 0.352969" mass="1.528" diaginertia="0.00645581 0.00640599 0.000733923" />
+                    <joint name="oFR_hipX" pos="0 0 0" axis="1 0 0" limited="true" stiffness="100" range="-1.2 0.7" damping="5" />
+                    <geom name="oFR_thigh_geom" class="overlay" type="mesh" mesh="thighR" />
+                    <body name="oFR_calf" pos="0.02069 -0.20833 -0.1422">
+                        <inertial pos="3.85741e-05 -0.150291 -0.0150309" quat="0.681092 0.732194 -0.00185835 0.00160362" mass="0.301" diaginertia="0.00247327 0.00245992 3.78788e-05" />
+                        <joint name="oFR_knee" pos="0 0 0" axis="1 0 0" springref="-0.7" limited="true" stiffness="100" range="-1.57 0.8" damping="5" />
+                        <geom name="oFR_calf_geom" class="overlay" quat="0.707109 0 0.707105 0" type="mesh" mesh="calf" />
+                    </body>
+                </body>
+            </body>
+            <body name="oRR_hip" pos="-0.0817145 0 -0.194401">
+                <inertial pos="0.0148759 0.000449378 0.000529985" quat="0.501529 0.483081 0.497831 0.516977" mass="1.096" diaginertia="0.000399307 0.000386506 0.000350852" />
+                <joint name="oRR_hipY" pos="0 0 0" axis="0 0 -1" limited="true" stiffness="100" range="-0.1 0.1" damping="5" />
+                <geom name="oRR_hip_geom" class="overlay"  type="mesh" mesh="hipR" />
+                <body name="oRR_thigh" pos="-0.053565 0 0">
+                    <inertial pos="-0.00417258 -0.0521245 -0.0384182" quat="0.263999 0.67598 -0.590566 0.352969" mass="1.528" diaginertia="0.00645581 0.00640599 0.000733923" />
+                    <joint name="oRR_hipX" pos="0 0 0" axis="1 0 0" limited="true" stiffness="100" range="-0.7 0.7" damping="5" />
+                    <geom name="oRR_thigh_geom" class="overlay"  type="mesh" mesh="thighR" />
+                    <body name="oRR_calf" pos="0.02069 -0.20833 -0.1422">
+                        <inertial pos="3.85741e-05 -0.150291 -0.0150309" quat="0.681092 0.732194 -0.00185835 0.00160362" mass="0.301" diaginertia="0.00247327 0.00245992 3.78788e-05" />
+                        <joint name="oRR_knee" pos="0 0 0" axis="1 0 0" springref="-0.7" limited="true" stiffness="100" range="-1.57 0.8" damping="5" />
+                        <geom name="oRR_calf_geom" class="overlay" quat="0.707109 0 0.707105 0" type="mesh" mesh="calf" />
+                    </body>
+                </body>
+            </body>
+        </body>
+
         <body name="stepl" pos="-7 0 0.8">
-        <geom name="stepl_geom" conaffinity="1" pos="0 0 -0.5" size="9 2 0.5" rgba=".0 .0 1 1" type="box"/>
+        <geom name="stepl_geom" conaffinity="3" contype = "0" pos="0 0 -0.5" size="9 2 0.5" rgba=".0 .0 1 1" type="box"/>
         </body>
         <body name="step0" pos="8 0 0.8">
         <camera name="step_track" pos="-6 -7 0" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
-        <geom name="step0_geom" conaffinity="1" pos="0 0 -0.5" size="6 2 0.5" rgba=".8 .2 .1 1" type="box"/>
+        <geom name="step0_geom" conaffinity="3" contype = "0" pos="0 0 -0.5" size="6 2 0.5" rgba=".8 .2 .1 1" type="box"/>
         </body>
         <body name="stepr" pos="22 0 0.8">
-        <geom name="stepr_geom" conaffinity="1" pos="0 0 -0.5" size="8 2 0.5" rgba=".0 .0 1 1" type="box"/>
+        <geom name="stepr_geom" conaffinity="3" contype = "0" pos="0 0 -0.5" size="8 2 0.5" rgba=".0 .0 1 1" type="box"/>
         </body>     
         <!-- <body name="step0" pos="2.3 0 0">
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
             <geom name="step0_geom" size="0.3 5 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body> -->
-        <body name="gtorso" pos="3 0 0.413904" quat="0.5 0.5 0.5 0.5">
+        <body name="gtorso" pos="3 0 1.213904" quat="0.5 0.5 0.5 0.5">
             <geom pos="0 0 0.043794" quat="0.707388 -0.706825 0 0" type="mesh" contype="0" conaffinity="0" rgba="0 1 0 0" mesh="torso" />
         </body>
     </worldbody>
@@ -126,6 +205,7 @@
         <general name="RR_knee" joint="RR_knee" gear="100 0 0 0 0 0" />
     </actuator>
     <keyframe>
-        <key qpos="0 -0.0130556 1.213904 0.506294 0.498835 0.479813 0.514402 0.01 -0.03 -0.76 0.02 -0.06 -0.86 0.01 -0.03 -0.76 0.02 -0.06 -0.86" />
+        <key qpos="0 -0.0130556 1.213904 0.506294 0.498835 0.479813 0.514402 0.01 -0.03 -0.76 0.02 -0.06 -0.86 0.01 -0.03 -0.76 0.02 -0.06 -0.86 
+                 0.0 -0.0130556 1.213904 0.506294 0.498835 0.479813 0.514402 0.01 -0.03 -0.76 0.02 -0.06 -0.86 0.01 -0.03 -0.76 0.02 -0.06 -0.86" />
     </keyframe>
 </mujoco>

@@ -93,8 +93,8 @@ class LaikagoEnv(MujocoEnv, EzPickle):
 
 
   def _get_obs(self):
-    position = self.sim.data.qpos.flat.copy()
-    velocity = self.sim.data.qvel.flat.copy()
+    position = self.sim.data.qpos.flat.copy()[:19] # only for first LK
+    velocity = self.sim.data.qvel.flat.copy()[:18] # only for first LK
     observation = np.concatenate((position, velocity)).ravel()
     return observation
 
