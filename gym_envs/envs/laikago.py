@@ -290,8 +290,8 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     # initialize the robot indices
     self._init_robot_indices()  
 
-    self.init_qpos = self.sim.data.qpos.ravel().copy()
-    self.init_qvel = self.sim.data.qvel.ravel().copy()
+    self.init_qpos = self.sim.model.key_qpos[0]
+    self.init_qvel = self.sim.model.key_qvel[0]
     
     # The default location of the obstacle
     if self._task_name == 'hurdle':
