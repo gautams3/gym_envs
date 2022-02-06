@@ -60,6 +60,11 @@ register(
     max_episode_steps=10000,
 )
 
+register(
+    id='laikago-v2',
+    entry_point='gym_envs.envs:Laikagov2Env',
+    max_episode_steps=10000,
+)
 
 register(
     id='walker2d-obstacle-v0',

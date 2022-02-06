@@ -190,6 +190,7 @@ class LaikagoOverlayEnv(LaikagoEnv):
     observation = np.concatenate((position, velocity)).ravel()
     return observation
 
+
 class Laikagov2Env(MujocoEnv, EzPickle):
   """This is a class for Laikago which has the overlay running all the time. 
   The states for the overlay environment are picked from the reference trajectories.  
@@ -701,16 +702,4 @@ class Dataset(object):
         action_batch = np.array([self.trans[index][1] for index in batch_indices])
 
         return state_batch, action_batch
-
-# Test the environment
-if __name__ == "__main__":
-  path_to_trajs = "/home/resl/Desktop/quad/RLJump/CMAES_helper/data"
-  env = Laikagov2Env(path_to_trajs = path_to_trajs)
-  obs = env.reset()
-  for _ in range(1000):
-    env.render()
-    next_obs, reward, done, info = env.step(env.action_space.sample())
-
-
-
 
