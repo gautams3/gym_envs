@@ -223,11 +223,11 @@ class Laikagov2Env(MujocoEnv, EzPickle):
               reset_noise_scale=0.,
               bad_contact_cost = 0.,
 
-              task_name='hurdle',
+              task_name='jumpup',
               path_to_trajs=None,
 
-              randomize_step_height=False,
-              randomize_step_location=False,
+              randomize_step_height=True,
+              randomize_step_location=True,
 
               sensing_threshold = 4.0,
               enable_overlay = True,
@@ -300,7 +300,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     # The default location of the obstacle
     if self._task_name == 'hurdle':
       self.cma_step_loc = self.model.body_pos[self.step0_idx][0] # same as step0_xpos
-    elif self._task_name == 'hurdle':
+    elif self._task_name == 'jumpup':
       self.cma_step_loc = self.model.body_pos[self.step0_idx][0] # same as step0_xpos
     elif self._task_name == 'stairs':
       raise NotImplementedError('stairs is not implemented yet!')
@@ -408,7 +408,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     elif self._task_name == 'stairs':
       self.num_sub_tasks = 5
     # load the trajectories
-    self.datasets = [Dataset(base_folder=self._path_to_trajs, robot_name = 'laikago', task = self._task_name, stage = i, load_actions=False) for i in range(self.num_sub_tasks)]
+    self.datasets = [Dataset(base_folder=self._path_to_trajs, robot_name = 'laikago', task = self._task_name, stage = i, load_actions=True) for i in range(self.num_sub_tasks)]
 
 
   def set_stage(self, stage):
@@ -569,13 +569,19 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     if step_height is not None:
       self.step_height = step_height
     else:
-      self.step_height = np.random.uniform(self.step_min_height, self.step_max_height)   
+      if self._randomize_step_height:
+        self.step_height = np.random.uniform(self.step_min_height, self.step_max_height)   
+      else:
+        self.step_height = self.step_default_height
 
     if step_location is not None:
       self.step_location = step_location + self.step0_xpos 
     else:
-      self.step_location = np.random.uniform(self.step_min_location, self.step_max_location) + self.step0_xpos
-    
+      if self._randomize_step_location:
+        self.step_location = np.random.uniform(self.step_min_location, self.step_max_location) + self.step0_xpos
+      else:
+        self.step_location = self.step_default_location + self.step0_xpos
+
     self.set_hurdle_height(self.step_height)
     self.set_hurdle_location(self.step_location)
 
