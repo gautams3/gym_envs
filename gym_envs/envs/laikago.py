@@ -215,22 +215,24 @@ class Laikagov2Env(MujocoEnv, EzPickle):
   The states for the overlay environment are picked from the reference trajectories.  
   """
   def __init__(self,
-               xml_path=None,
-               frame_skip=5,
+              xml_path=None,
+              frame_skip=5,
 
-               forward_reward_weight=1.0,
-               ctrl_cost_weight=0.1,
-               reset_noise_scale=0.,
-               bad_contact_cost = 0.,
+              forward_reward_weight=1.0,
+              ctrl_cost_weight=0.1,
+              reset_noise_scale=0.,
+              bad_contact_cost = 0.,
 
-               task_name='hurdle',
-               path_to_trajs=None,
+              task_name='hurdle',
+              path_to_trajs=None,
 
-               randomize_step_height=False,
-               randomize_step_location=False,
+              randomize_step_height=False,
+              randomize_step_location=False,
 
-               sensing_threshold = 4.0,
-               ):
+              sensing_threshold = 4.0,
+              enable_overlay = True,
+              max_episode_steps = 500,
+              ):
     EzPickle.__init__(**locals())
 
     # set the weights and scales
@@ -244,8 +246,10 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     assert task_name in ['jumpup', 'hurdle', 'stairs'], 'task_name should be one of jumpup, hurdle, stairs!!'
     self._task_name = task_name
 
-    # set the sensing threshold
+    # set other class variables
     self._sensing_threshold = sensing_threshold
+    self._enable_overlay = enable_overlay
+    self._max_episode_steps = max_episode_steps
 
     # set the path to the trajectories
     if path_to_trajs is None:
@@ -312,15 +316,16 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     # reset the model
     self.reset_model()
 
+    # reset the overlay
+    self.reset_overlay()
+
+    # Note: By default, the robot will never zero reset to a location with x_offset of the step location.
+    self.robot_has_crossed_x_offset = False
+
     self.metadata = {
         "render.modes": ["human", "rgb_array", "depth_array"],
         "video.frames_per_second": int(np.round(1.0 / self.dt)),
     }
-
-
-    
-    # This step number tracks the number of steps since the last reset
-    self.step_number = 0
 
     self._set_action_space()
 
@@ -342,7 +347,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       self.step_max_height = 0.4
       self.step_default_height = 0.2
       self.step_min_location = 0.0
-      self.step_max_location = 2.0
+      self.step_max_location = 4.0
       self.step_default_location = 0.0
       self.step_inc = 0.05
     elif self._task_name == 'jumpup':
@@ -350,7 +355,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       self.step_max_height = 0.4
       self.step_default_height = 0.2
       self.step_min_location = 0.0
-      self.step_max_location = 2.0
+      self.step_max_location = 4.0
       self.step_default_location = 0.0
       self.step_inc = 0.05
     elif self._task_name == 'stairs':
@@ -526,8 +531,8 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     Returns:
         numpy array: Observation array of the robot.
     """
-    position = self.sim.data.qpos.flat.copy()[:19] # only for first 19 are for the real LK, the rest are from overlay LK 
-    velocity = self.sim.data.qvel.flat.copy()[:18] # only for first 18 are for the real LK, the rest are from overlay LK
+    position = self.sim.data.qpos.flat.copy()[:self.env_qpos_idxs.shape[0]] # only for first 19 are for the real LK, the rest are from overlay LK 
+    velocity = self.sim.data.qvel.flat.copy()[:self.env_qvel_idxs.shape[0]] # only for first 18 are for the real LK, the rest are from overlay LK
     observation = np.concatenate((position, velocity)).ravel()
     return observation
 
@@ -548,12 +553,19 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
     self.set_state(qpos, qvel)
 
+    self.step_number = 0
+
     observation = self._get_obs()
     return observation
 
 
   def reset_obstacle(self, step_height=None, step_location = None):
-    """ Resets the Obstale"""
+    """ Resets the Obstale
+    
+    Args:
+      step_height (float): The height of the obstacle.
+      step_location (float): The location of the obstacle.
+    """
     if step_height is not None:
       self.step_height = step_height
     else:
@@ -595,7 +607,10 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     # reset the obstacle
     self.reset_obstacle(step_height, step_location)
 
-    self.step_number = 0
+    # reset the overlay
+    self.reset_overlay()
+
+    self.robot_has_crossed_x_offset = False
 
     return self.get_augmented_observation(joint_states)
 
@@ -643,18 +658,73 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     return self._get_obs()
 
 
-  def step_overlay(self, curr_state):
-    """ Step the overlay model.
+  def set_overlay_state(self, imi_qpos, imi_qvel):
+    """ Set the overlay to the desired state
+
+    Args:
+        qpos (numpy array): The position of the overlay.
+        qvel (numpy array): The velocity of the overlay.
     """
-    self.overlay_state = self.dataset.reference_states[self.step_number].copy()
-    self.overlay_state[0] += self.x_offset
-    imi_qpos = self.overlay_state[self.env_qpos_idxs]
-    imi_qvel = self.overlay_state[self.env_qvel_idxs]
+    curr_state = self._get_obs()
     qpos = curr_state[self.env_qpos_idxs]
     qvel = curr_state[self.env_qvel_idxs]
     total_qpos = np.concatenate([qpos, imi_qpos])
     total_qvel = np.concatenate([qvel, imi_qvel])
     self.set_state(total_qpos, total_qvel)
+
+
+  def step_overlay(self):
+    """ Updates the overlay based on the current overlay_step_number
+    """
+    self.overlay_state = self.dataset.reference_states[self.overlay_step_number].copy()
+    self.overlay_state[0] += self.x_offset
+    imi_qpos = self.overlay_state[self.env_qpos_idxs]
+    imi_qvel = self.overlay_state[self.env_qvel_idxs]
+    self.set_overlay_state(imi_qpos, imi_qvel)
+
+  def move_overlay(self, curr_state):
+    """ Step the overlay model.
+    """
+    if self.overlay_step_number < (self.dataset.reference_states.shape[0] - 1):
+      self.overlay_step_number += 1
+
+    self.step_overlay()
+
+
+  def reset_overlay(self):
+    """ Resets the overlay to its starting position
+    """
+    self.overlay_step_number = 0
+
+    self.step_overlay()
+
+
+
+  def is_robot_ahead_of_x_offset(self):
+    """ Check if the robot is currently ahead of the x offset.
+    """
+    if self._get_obs()[0] >= self.dataset.reference_states[0].copy()[0] + self.x_offset:
+      self.robot_has_crossed_x_offset = True
+      return True
+    else:
+      return False
+  
+
+  def should_move_overlay(self):
+    """ The overlay will move if the robot has crossed the x_offset of if it has ever crossed it before
+    """
+    if self.robot_has_crossed_x_offset or self.is_robot_ahead_of_x_offset():
+      return True
+    
+
+  def should_terminate(self):
+    """ Check if the episode should terminate.
+    The episode will terminate if the environment counter has reached max_steps.
+    """
+    if self.step_number >= self._max_episode_steps:
+      return True
+    else:
+      return False
 
 
   def step(self, action):
@@ -669,15 +739,17 @@ class Laikagov2Env(MujocoEnv, EzPickle):
         bool: Whether the episode is done.
         dict: Additional information.
     """
-
     action = np.hstack([action, action]) # duplicate the action for the left and right legs
     prev_state = self._get_obs()
     self.do_simulation(action, self.frame_skip)
-    curr_state = self._get_obs()    
-    self.step_number += 1
+    curr_state = self._get_obs() 
 
-    # move the overlay model
-    self.step_overlay(curr_state)
+    # increase the step counter
+    self.step_number += 1 
+
+    # move the overlay model if required
+    if self._enable_overlay and self.should_move_overlay():
+        self.move_overlay(curr_state)
 
     # Velocity
     x_after = curr_state[0]
@@ -696,7 +768,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     reward = forward_reward - ctrl_cost - orientation_cost
 
     observation = self.get_augmented_observation(curr_state)
-    done = (self.step_number >= (self.dataset.reference_states.shape[0] - 1))
+    done = self.should_terminate()
     info = {
       'x_position': x_after,
       'x_velocity': x_vel,
