@@ -408,7 +408,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     elif self._task_name == 'stairs':
       self.num_sub_tasks = 5
     # load the trajectories
-    self.datasets = [Dataset(base_folder=self._path_to_trajs, robot_name = 'laikago', task = self._task_name, stage = i, load_actions=True) for i in range(self.num_sub_tasks)]
+    self.datasets = [Dataset(base_folder=self._path_to_trajs, robot_name = 'laikago', task = self._task_name, stage = i, load_actions=False) for i in range(self.num_sub_tasks)]
 
 
   def set_stage(self, stage):
@@ -705,23 +705,19 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.step_overlay()
 
 
-
-  def is_robot_ahead_of_x_offset(self):
-    """ Check if the robot is currently ahead of the x offset.
+  def should_move_overlay(self):
+    """ The overlay will move if the robot has crossed the x_offset of if it has ever crossed it before
     """
+    if self.robot_has_crossed_x_offset:
+      return True
+
     if self._get_obs()[0] >= self.dataset.reference_states[0].copy()[0] + self.x_offset:
       self.robot_has_crossed_x_offset = True
       return True
     else:
       return False
-  
-
-  def should_move_overlay(self):
-    """ The overlay will move if the robot has crossed the x_offset of if it has ever crossed it before
-    """
-    if self.robot_has_crossed_x_offset or self.is_robot_ahead_of_x_offset():
-      return True
     
+
 
   def should_terminate(self):
     """ Check if the episode should terminate.
