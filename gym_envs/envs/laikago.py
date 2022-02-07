@@ -231,7 +231,9 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
               sensing_threshold = 4.0,
               enable_overlay = True,
-              max_episode_steps = 500,
+              max_episode_steps = 400,
+
+              sparse_reward = False,
               ):
     EzPickle.__init__(**locals())
 
@@ -250,6 +252,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self._sensing_threshold = sensing_threshold
     self._enable_overlay = enable_overlay
     self._max_episode_steps = max_episode_steps
+    self._sparse_reward = sparse_reward
 
     # set the path to the trajectories
     if path_to_trajs is None:
@@ -310,10 +313,13 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self._randomize_step_location = randomize_step_location
     self._set_obstacle_distribution()
 
+    # set success thresholds
+    self._set_obstacle_success_parameters()
+
     # reset the obstacle height and location
     self.reset_obstacle()
 
-    # reset the model
+    # reset the model, this also sets a lot of other cumulative variables
     self.reset_model()
 
     # reset the overlay
@@ -336,6 +342,17 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self._set_observation_space(observation)
 
     self.seed()
+
+
+  def _set_obstacle_success_parameters(self):
+    """ Sets the x offset the robot must get to ahead of the obstacle in order to succeed.
+    """
+    if self._task_name == 'hurdle':
+      self.x_beyond_obstacle = 2
+    elif self._task_name == 'jumpup':
+      self.x_beyond_obstacle = 2
+    elif self._task_name == 'stairs':
+      raise NotImplementedError('stairs is not implemented yet!')
 
 
   def _set_obstacle_distribution(self):
@@ -537,6 +554,20 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     return observation
 
 
+  def set_robot_state(self, state):
+    """ Set the state of the robot only.
+    """
+    overlay_qpos = self.sim.data.qpos.flat.copy()[self.env_qpos_idxs.shape[0]:]
+    overlay_qvel = self.sim.data.qvel.flat.copy()[self.env_qvel_idxs.shape[0]:]
+
+    new_robot_qpos = state[:self.env_qpos_idxs.shape[0]]
+    new_robot_qvel = state[:self.env_qvel_idxs.shape[0]]
+
+    new_qpos = np.concatenate((new_robot_qpos, overlay_qpos))
+    new_qvel = np.concatenate((new_robot_qvel, overlay_qvel))
+    self.set_state(new_qpos, new_qvel)
+
+
   def reset_model(self):
     """ Resets the robot to its initial state after adding a little noise if needed.
 
@@ -554,6 +585,16 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.set_state(qpos, qvel)
 
     self.step_number = 0
+    self.max_height = 0
+    self.min_height = 99999   
+
+    self.robot_has_crossed_x_offset = False
+    self.cumulative_dense_reward = 0
+
+    self.gym_rew_fwd = 0
+    self.gym_rew_ctrl = 0
+    self.gym_rew_orientation = 0
+        
 
     observation = self._get_obs()
     return observation
@@ -616,17 +657,18 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     # reset the overlay
     self.reset_overlay()
 
-    self.robot_has_crossed_x_offset = False
 
-    return self.get_augmented_observation(joint_states)
+    return self.get_augmented_observation()
 
 
-  def get_augmented_observation(self, joint_states):
+  def get_augmented_observation(self):
     """ Get the observation of the robot.
 
     Returns:
         dict: Observation dictionary of the robot.
     """
+    joint_states = self._get_obs()
+
     # get the observation as a dictionary of the joint states and it's sensing of the obstacle
     if self._task_name == 'hurdle':
       self.relative_location_of_left_edge = (self.model.body_pos[self.step0_idx, 0] - self.model.geom_size[self.step0geom_idx, 0]) - joint_states[0]
@@ -688,7 +730,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     imi_qvel = self.overlay_state[self.env_qvel_idxs]
     self.set_overlay_state(imi_qpos, imi_qvel)
 
-  def move_overlay(self, curr_state):
+  def move_overlay(self,):
     """ Step the overlay model.
     """
     if self.overlay_step_number < (self.dataset.reference_states.shape[0] - 1):
@@ -700,28 +742,25 @@ class Laikagov2Env(MujocoEnv, EzPickle):
   def reset_overlay(self):
     """ Resets the overlay to its starting position
     """
-    self.overlay_step_number = 0
+    # we set it to 1 since we want the state to which we arrive at each step.
+    self.overlay_step_number = 1
 
     self.step_overlay()
 
 
-
-  def is_robot_ahead_of_x_offset(self):
-    """ Check if the robot is currently ahead of the x offset.
+  def should_move_overlay(self):
+    """ The overlay will move if the robot has crossed the x_offset of if it has ever crossed it before
     """
+    if self.robot_has_crossed_x_offset:
+      return True
+
     if self._get_obs()[0] >= self.dataset.reference_states[0].copy()[0] + self.x_offset:
       self.robot_has_crossed_x_offset = True
       return True
     else:
       return False
-  
-
-  def should_move_overlay(self):
-    """ The overlay will move if the robot has crossed the x_offset of if it has ever crossed it before
-    """
-    if self.robot_has_crossed_x_offset or self.is_robot_ahead_of_x_offset():
-      return True
     
+
 
   def should_terminate(self):
     """ Check if the episode should terminate.
@@ -731,6 +770,89 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       return True
     else:
       return False
+
+
+  def calculate_sparse_reward(self, prev_state, curr_state, action):
+    """ Calculate the sparse reward for the current state.
+    """
+    self.cumulative_dense_reward += self.calculate_dense_reward(prev_state, curr_state, action)
+    # If robot is on the left of the success x position, the reward is 0
+    if self.relative_location_of_left_edge > -self.x_beyond_obstacle:
+      return 0
+    else:
+      return self.cumulative_dense_reward
+
+
+
+  def calculate_dense_reward(self, prev_state, curr_state, action):
+    """ Calculate the Dense reward of the current step.
+
+    Args:
+        prev_state (numpy array): The state of the robot at the previous step.
+        curr_state (numpy array): The state of the robot at the current step.
+        action (numpy array): The action of the robot at the current step.
+
+    Returns:
+        float: The reward of the current step.
+    """
+    # Velocity
+    self.x_after = curr_state[0]
+    x_before = prev_state[0]
+    self.x_vel = (self.x_after - x_before)/(self.dt)
+    self.forward_reward = self._forward_reward_weight * self.x_vel
+    
+    # Orientation
+    # TODO: Check if the indices used for the state are correct
+    self.orientation_cost = quat_dist(curr_state[3:7], np.array([0.5, 0.5, 0.5, 0.5]))
+
+    # Action
+    self.ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
+
+    # Total
+    reward = self.forward_reward - self.ctrl_cost - self.orientation_cost
+
+    self.gym_rew_fwd += self.forward_reward
+    self.gym_rew_ctrl += (-self.ctrl_cost)
+    self.gym_rew_orientation += (-self.orientation_cost)
+    
+    return reward
+
+
+  def calculate_reward(self, prev_state, curr_state, action):
+    """ Calculate the reward of the current step.
+
+    Args:
+        prev_state (numpy array): The state of the robot at the previous step.
+        curr_state (numpy array): The state of the robot at the current step.
+        action (numpy array): The action of the robot at the current step.
+
+    Returns:
+        float: The reward of the current step.
+    """
+    if self._sparse_reward:
+      return self.calculate_sparse_reward(prev_state, curr_state, action)
+    else:
+      return self.calculate_dense_reward(prev_state, curr_state, action)
+
+
+  def get_info(self):
+    """ Returns the info of the environment.
+    """
+    info = {
+      'x_position': self.x_after,
+      'x_velocity': self.x_vel,
+      'reward_run': self.forward_reward,
+      'reward_ctrl': -self.ctrl_cost,
+      'reward_orientation': -self.orientation_cost,
+      'cumulative_reward': self.cumulative_dense_reward,
+
+      'episode_extra_stats': {
+        'episode_max_height': self.max_height,
+        'episode_min_height': self.min_height,
+        'step_height': self.step_height,
+      }
+    }
+    return info
 
 
   def step(self, action):
@@ -750,38 +872,27 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.do_simulation(action, self.frame_skip)
     curr_state = self._get_obs() 
 
+    # update some info
+    self.max_height = max(self.max_height, curr_state[self.robot_height_index])
+    self.min_height = min(self.min_height, curr_state[self.robot_height_index])
+
+
     # increase the step counter
     self.step_number += 1 
 
     # move the overlay model if required
     if self._enable_overlay and self.should_move_overlay():
-        self.move_overlay(curr_state)
+        self.move_overlay()
 
-    # Velocity
-    x_after = curr_state[0]
-    x_before = prev_state[0]
-    x_vel = (x_after - x_before)/(self.dt)
-    forward_reward = self._forward_reward_weight * x_vel
+    observation = self.get_augmented_observation()
 
-    # Orientation
-    # TODO: Check if the indices used for the state are correct
-    orientation_cost = quat_dist(curr_state[3:7], np.array([0.5, 0.5, 0.5, 0.5]))
+    # calculate the reward
+    reward = self.calculate_reward(prev_state, curr_state, action)
 
-    # Action
-    ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
-
-    # Total
-    reward = forward_reward - ctrl_cost - orientation_cost
-
-    observation = self.get_augmented_observation(curr_state)
     done = self.should_terminate()
-    info = {
-      'x_position': x_after,
-      'x_velocity': x_vel,
-      'reward_run': forward_reward,
-      'reward_ctrl': -ctrl_cost,
-      'reward_orientation': -orientation_cost,
-    }
+
+    info = self.get_info()
+
     return observation, reward, done, info
 
 
