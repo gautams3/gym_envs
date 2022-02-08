@@ -93,40 +93,40 @@
                 </body>
             </body>
         </body>
-        <body name="step0" pos="2.5 0 0.2">
+        <body name="step0" pos="1.5 0 0.3">
             <camera name="step0_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom name="step0_geom" size="0.3 2 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step0_geom" size="0.3 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
-        <body name="step1" pos="3.1 0 0.4">
+        <body name="step1" pos="3 0 0.4">
             <camera name="step1_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom name="step1_geom" size="0.3 2 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step1_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
-        <body name="step2" pos="3.7 0 0.6">
+        <body name="step2" pos="7.5 0 0.6">
             <camera name="step2_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom name="step2_geom" size="0.3 2 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step2_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
-        <body name="step3" pos="4.3 0 0.8">
+        <body name="step3" pos="10 0 0.8">
             <camera name="step3_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom name="step3_geom" size="0.3 2 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step3_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
-        <body name="step4" pos="4.9 0 1.0">
+        <body name="step4" pos="12.5 0 1.0">
             <camera name="step4_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom name="step4_geom" size="0.3 2 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step4_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
-        <body name="step5" pos="5.5 0 1.2">
+        <body name="step5" pos="15 0 1.2">
             <camera name="step5_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom name="step5_geom" size="0.3 2 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step5_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
-        <body name="step6" pos="6.1 0 1.4">
+        <body name="step6" pos="17.5 0 1.4">
             <camera name="step6_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
-            <geom name="step6_geom" size="0.3 2 0.5" pos="0 0 -0.5" type="box" conaffinity="1" rgba="0.7 0 0 1" />
+            <geom name="step6_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
 
         <body name="gtorso" pos="0 0 0.413904" quat="0.5 0.5 0.5 0.5">
