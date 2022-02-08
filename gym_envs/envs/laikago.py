@@ -348,9 +348,9 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     """ Sets the x offset the robot must get to ahead of the obstacle in order to succeed.
     """
     if self._task_name == 'hurdle':
-      self.x_beyond_obstacle = 2
+      self.x_beyond_obstacle = 1
     elif self._task_name == 'jumpup':
-      self.x_beyond_obstacle = 2
+      self.x_beyond_obstacle = 1
     elif self._task_name == 'stairs':
       raise NotImplementedError('stairs is not implemented yet!')
 
