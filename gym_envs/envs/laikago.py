@@ -782,7 +782,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     if self.relative_location_of_left_edge > -self.x_beyond_obstacle:
       return 0
     else:
-      return 1 #self.cumulative_dense_reward
+      return 1 + (self.orientation_cost * 0.3/np.pi)#self.cumulative_dense_reward
 
 
 
