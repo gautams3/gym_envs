@@ -684,6 +684,8 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       augmented_obs['stepht'] = 0
     else:
       augmented_obs['stepht'] = np.array([self.step_height])
+
+    augmented_obs['overlay_time'] = np.array([self.overlay_step_number])
     return augmented_obs
 
 
