@@ -220,6 +220,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
               forward_reward_weight=1.0,
               ctrl_cost_weight=0.1,
+              orientation_cost_weight=0.3,
               reset_noise_scale=0.,
               bad_contact_cost = 0.,
 
@@ -242,6 +243,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self._ctrl_cost_weight = ctrl_cost_weight
     self._reset_noise_scale = reset_noise_scale
     self._bad_contact_cost = bad_contact_cost
+    self._orientation_cost_weight = orientation_cost_weight
 
     # set the task name
     # can be ['jumpup', 'hurdle', 'stairs'], default is 'hurdle'
@@ -780,9 +782,9 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.cumulative_dense_reward += self.calculate_dense_reward(prev_state, curr_state, action)
     # If robot is on the left of the success x position, the reward is 0
     if self.relative_location_of_left_edge > -self.x_beyond_obstacle:
-      return 0 - (self.orientation_cost * 0.3/np.pi)
+      return 0 - (self.orientation_cost * self._orientation_cost_weight/np.pi)
     else:
-      return 1 - (self.orientation_cost * 0.3/np.pi)#self.cumulative_dense_reward
+      return 1 - (self.orientation_cost * self._orientation_cost_weight/np.pi)#self.cumulative_dense_reward
 
 
 
