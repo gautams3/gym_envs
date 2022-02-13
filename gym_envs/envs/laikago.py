@@ -782,9 +782,9 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.cumulative_dense_reward += self.calculate_dense_reward(prev_state, curr_state, action)
     # If robot is on the left of the success x position, the reward is 0
     if self.relative_location_of_left_edge > -self.x_beyond_obstacle:
-      return 0 - (self.orientation_cost * self._orientation_cost_weight/np.pi)
+      return 0 - (self.orientation_cost * self._orientation_cost_weight/np.pi) - (self.ctrl_cost)
     else:
-      return 1 - (self.orientation_cost * self._orientation_cost_weight/np.pi)#self.cumulative_dense_reward
+      return 1 - (self.orientation_cost * self._orientation_cost_weight/np.pi) - (self.ctrl_cost)#self.cumulative_dense_reward
 
 
 
