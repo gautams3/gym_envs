@@ -3,6 +3,7 @@ import gym
 from gym.utils import EzPickle
 from gym.envs.mujoco.mujoco_env import MujocoEnv
 from gym import error
+import traceback
 
 import os
 from os import path
@@ -873,7 +874,12 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     """
     action = np.hstack([action, action]) # duplicate the action for the left and right legs
     prev_state = self._get_obs()
-    self.do_simulation(action, self.frame_skip)
+    try:
+      self.do_simulation(action, self.frame_skip)
+    except mujoco_py.MujocoException:
+      print(f"Mujoco Exception!\n for state: {prev_state} \n and action: {action}")
+      traceback.print_exc() 
+      return self.get_augmented_observation(), 0, True, self.get_info()
     curr_state = self._get_obs() 
 
     # update some info
