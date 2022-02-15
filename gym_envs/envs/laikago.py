@@ -731,9 +731,10 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     """
     self.overlay_state = self.dataset.reference_states[self.overlay_step_number].copy()
     self.overlay_state[0] += self.x_offset
-    imi_qpos = self.overlay_state[self.env_qpos_idxs]
-    imi_qvel = self.overlay_state[self.env_qvel_idxs]
-    self.set_overlay_state(imi_qpos, imi_qvel)
+    if self._enable_overlay:
+      imi_qpos = self.overlay_state[self.env_qpos_idxs]
+      imi_qvel = self.overlay_state[self.env_qvel_idxs]
+      self.set_overlay_state(imi_qpos, imi_qvel)
 
   def move_overlay(self,):
     """ Step the overlay model.
@@ -891,7 +892,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.step_number += 1 
 
     # move the overlay model if required
-    if self._enable_overlay and self.should_move_overlay():
+    if self.should_move_overlay():
         self.move_overlay()
 
     observation = self.get_augmented_observation()
