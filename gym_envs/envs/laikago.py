@@ -236,6 +236,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
               max_episode_steps = 400,
 
               sparse_reward = False,
+              fwd_reward_only = False,
               ):
     EzPickle.__init__(**locals())
 
@@ -245,6 +246,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self._reset_noise_scale = reset_noise_scale
     self._bad_contact_cost = bad_contact_cost
     self._orientation_cost_weight = orientation_cost_weight
+    self.fwd_reward_only = fwd_reward_only
 
     # set the task name
     # can be ['jumpup', 'hurdle', 'stairs'], default is 'hurdle'
@@ -816,7 +818,10 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.ctrl_cost = self._ctrl_cost_weight * np.sum(np.square(action))
 
     # Total
-    reward = self.forward_reward - self.ctrl_cost - self.orientation_cost
+    if self.fwd_reward_only:
+        reward = self.forward_reward
+    else:
+        reward = self.forward_reward - self.ctrl_cost - self.orientation_cost
 
     self.gym_rew_fwd += self.forward_reward
     self.gym_rew_ctrl += (-self.ctrl_cost)
