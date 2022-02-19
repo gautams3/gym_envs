@@ -103,7 +103,7 @@
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
             <geom name="step1_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
         </body>
-        <body name="step2" pos="7.5 0 0.6">
+        <!-- <body name="step2" pos="7.5 0 0.6">
             <camera name="step2_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
             <geom name="step2_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
@@ -127,7 +127,7 @@
             <camera name="step6_track" pos="-0.5 -5 0.5" quat="0.7071068 0.7071068 0.0 0.0" mode="trackcom" />
             <inertial pos="0 0 -0.5" mass="1200" diaginertia="500 136 436" />
             <geom name="step6_geom" size="0.6 2 1" pos="0 0 -1" type="box" conaffinity="1" rgba="0.7 0 0 1" />
-        </body>
+        </body> -->
 
         <body name="gtorso" pos="0 0 0.413904" quat="0.5 0.5 0.5 0.5">
             <geom pos="0 0 0.043794" quat="0.707388 -0.706825 0 0" type="mesh" contype="0" conaffinity="0" rgba="0 1 0 0" mesh="torso" />

@@ -175,8 +175,8 @@ class LaikagoOverlayEnv(LaikagoEnv):
       self._xml_path = os.path.join(curr_dir, 'assets', 'laikago', 'laikago_overlay.xml')
     else:
       self._xml_path = xml_path
-    super(LaikagoOverlayEnv, self).__init__(xml_path=self._xml_path, 
-                                            reset_noise_scale=reset_noise_scale, 
+    super(LaikagoOverlayEnv, self).__init__(xml_path=self._xml_path,
+                                            reset_noise_scale=reset_noise_scale,
                                             frame_skip=frame_skip,
                                             forward_reward_weight=forward_reward_weight,
                                             ctrl_cost_weight=ctrl_cost_weight,
@@ -212,8 +212,8 @@ class LaikagoOverlayEnv(LaikagoEnv):
 
 
 class Laikagov2Env(MujocoEnv, EzPickle):
-  """This is a class for Laikago which has the overlay running all the time. 
-  The states for the overlay environment are picked from the reference trajectories.  
+  """This is a class for Laikago which has the overlay running all the time.
+  The states for the overlay environment are picked from the reference trajectories.
   """
   def __init__(self,
               xml_path=None,
@@ -263,7 +263,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     if path_to_trajs is None:
       raise ValueError('path_to_trajs is None!, For this env, it should be set!')
     self._path_to_trajs = path_to_trajs
-    
+
     # load the trajectories
     self.load_trajs()
 
@@ -279,7 +279,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     else:
       if self._task_name is not None:
         print(f"Note: task_name is {self._task_name}. Be sure the provided xml is for this task!")
-      self._xml_path = xml_path    
+      self._xml_path = xml_path
 
     # initialize the Mujoco env
     # MujocoEnv.__init__(self, self._xml_path, frame_skip=frame_skip)
@@ -297,21 +297,22 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self._viewers = {}
 
     # initialize the task obstacle indices
-    self._init_task_object_indices() 
+    self._init_task_object_indices()
 
     # initialize the robot indices
-    self._init_robot_indices()  
+    self._init_robot_indices()
 
     self.init_qpos = self.sim.model.key_qpos[0]
     self.init_qvel = self.sim.model.key_qvel[0]
-    
+
     # The default location of the obstacle
     if self._task_name == 'hurdle':
       self.cma_step_loc = self.model.body_pos[self.step0_idx][0] # same as step0_xpos
     elif self._task_name == 'jumpup':
       self.cma_step_loc = self.model.body_pos[self.step0_idx][0] # same as step0_xpos
     elif self._task_name == 'stairs':
-      raise NotImplementedError('stairs is not implemented yet!')
+      self.cma_step_loc = self.model.body_pos[self.step0_idx][0] # same as step0_xpos
+      # raise NotImplementedError('stairs is not implemented yet!')
 
     # set obstacle height and location parameters
     self._randomize_step_height = randomize_step_height
@@ -357,7 +358,8 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     elif self._task_name == 'jumpup':
       self.x_beyond_obstacle = 1
     elif self._task_name == 'stairs':
-      raise NotImplementedError('stairs is not implemented yet!')
+      self.x_beyond_obstacle = 1
+      # raise NotImplementedError('stairs is not implemented yet!')
 
 
   def _set_obstacle_distribution(self):
@@ -381,7 +383,14 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       self.step_default_location = 0.0
       self.step_inc = 0.05
     elif self._task_name == 'stairs':
-      raise NotImplementedError('stairs task is not implemented yet!')
+      self.step_min_height = 0.0
+      self.step_max_height = 0.4
+      self.step_default_height = 0.2
+      self.step_min_location = 0.0
+      self.step_max_location = 4.0
+      self.step_default_location = 0.0
+      self.step_inc = 0.05
+      # raise NotImplementedError('stairs task is not implemented yet!')
 
 
   def _init_robot_indices(self):
@@ -398,24 +407,24 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     if self._task_name == 'hurdle':
       self.step0_idx = self.model.body_name2id('step0')
       self.step0geom_idx = self.model.geom_name2id('step0_geom')
-      self.step0_xpos = self.model.body_pos[self.step0_idx][0]    
+      self.step0_xpos = self.model.body_pos[self.step0_idx][0]
     elif self._task_name == 'jumpup':
       self.step0_idx = self.model.body_name2id('step0')
       self.step0geom_idx = self.model.geom_name2id('step0_geom')
-      self.step0_xpos = self.model.body_pos[self.step0_idx][0]    
+      self.step0_xpos = self.model.body_pos[self.step0_idx][0]
     elif self._task_name == 'stairs':
       # step 0
-      # self.step0_idx = self.model.body_name2id('step0')
-      # self.step0geom_idx = self.model.geom_name2id('step0_geom')
-      # self.step0_xpos = self.model.body_pos[self.step0_idx][0]    
+      self.step0_idx = self.model.body_name2id('step0')
+      self.step0geom_idx = self.model.geom_name2id('step0_geom')
+      self.step0_xpos = self.model.body_pos[self.step0_idx][0]
 
       # step 1
-      # self.step1_idx = self.model.body_name2id('step1')
-      # self.step1geom_idx = self.model.geom_name2id('step1_geom')
-      # self.step1_xpos = self.model.body_pos[self.step1_idx][0]    
+      self.step1_idx = self.model.body_name2id('step1')
+      self.step1geom_idx = self.model.geom_name2id('step1_geom')
+      self.step1_xpos = self.model.body_pos[self.step1_idx][0]
 
-      # ...            
-      raise NotImplementedError('Get the indices of the stairs task from the XML!')
+      # ...
+      # raise NotImplementedError('Get the indices of the stairs task from the XML!')
 
 
   def load_trajs(self):
@@ -428,7 +437,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     elif self._task_name == 'jumpup':
       self.num_sub_tasks = 9
     elif self._task_name == 'stairs':
-      self.num_sub_tasks = 5
+      self.num_sub_tasks = 9
     # load the trajectories
     self.datasets = [Dataset(base_folder=self._path_to_trajs, robot_name = 'laikago', task = self._task_name, stage = i, load_actions=True) for i in range(self.num_sub_tasks)]
 
@@ -439,7 +448,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     """
     assert stage in range(self.num_sub_tasks), f"stage should be in {range(self.num_sub_tasks)} for task {self._task_name}"
     self.stage = stage
-    
+
     if self._task_name == 'hurdle':
       self.set_hurdle_stage(stage)
     elif self._task_name == 'jumpup':
@@ -484,11 +493,13 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
 
   def set_stairs_stage(self, stage):
-    raise NotImplementedError('Set the stage of the stairs task!')
+    step_height = 0.05 * stage
+    self.set_hurdle_height(step_height)
+    # raise NotImplementedError('Set the stage of the stairs task!')
 
 
   def set_obstacle_height(self, height):
-    """ Set the height of the Obstacle. 
+    """ Set the height of the Obstacle.
     For the hurdle task, this is the height of the Step0 obstacle.
     For the jumpup task, this is the height of the Step0 obstacle.
     For the stairs task, this is the height of each step the robot has to take.
@@ -518,11 +529,13 @@ class Laikagov2Env(MujocoEnv, EzPickle):
   def set_stairs_location(self, location):
     """ Set the location of the stairs obstacle
     """
-    raise NotImplementedError('Set the location of the stairs obstacle!')
+    self.model.body_pos[self.step0_idx, 0] = location
+    self.sim.forward() # won't increment timestep by 1
+    # raise NotImplementedError('Set the location of the stairs obstacle!')
 
 
   def set_obstacle_location(self, location):
-    """ Set the location of the obstacle. 
+    """ Set the location of the obstacle.
     For the hurdle task, this is the location of the Step0 obstacle.
     For the jumpup task, this is the location of the Step0 obstacle.
     For the stairs task, this is the location of staircase.
@@ -537,23 +550,23 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
   def _set_action_space(self):
     """ Override the default action space. The Default action space is 12 DOF, since there are 12 actuators.
-      We have a symmetric action space, so we only need 6 DOF. Same actions will be applied to both Left and Right 
+      We have a symmetric action space, so we only need 6 DOF. Same actions will be applied to both Left and Right
       legs of the LK.
 
       Returns:
         action_space (gym.spaces.Box): The action space of the environment.
     """
-    self.action_space = gym.spaces.Box(low=-1, high=1, shape=(6,)) # Hardcoded for Laikago  
-    
+    self.action_space = gym.spaces.Box(low=-1, high=1, shape=(6,)) # Hardcoded for Laikago
+
     return self.action_space
-  
+
   def _get_obs(self):
     """ Gets the observation as the qpos and qvel of the robot only.
 
     Returns:
         numpy array: Observation array of the robot.
     """
-    position = self.sim.data.qpos.flat.copy()[:self.env_qpos_idxs.shape[0]] # only for first 19 are for the real LK, the rest are from overlay LK 
+    position = self.sim.data.qpos.flat.copy()[:self.env_qpos_idxs.shape[0]] # only for first 19 are for the real LK, the rest are from overlay LK
     velocity = self.sim.data.qvel.flat.copy()[:self.env_qvel_idxs.shape[0]] # only for first 18 are for the real LK, the rest are from overlay LK
     observation = np.concatenate((position, velocity)).ravel()
     return observation
@@ -577,7 +590,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     """ Resets the robot to its initial state after adding a little noise if needed.
 
     Returns:
-        numpy array: Observation array of the robot after reset.    
+        numpy array: Observation array of the robot after reset.
     """
     noise_low = -self._reset_noise_scale
     noise_high = self._reset_noise_scale
@@ -591,7 +604,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
     self.step_number = 0
     self.max_height = 0
-    self.min_height = 99999   
+    self.min_height = 99999
 
     self.robot_has_crossed_x_offset = False
     self.cumulative_dense_reward = 0
@@ -599,7 +612,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.gym_rew_fwd = 0
     self.gym_rew_ctrl = 0
     self.gym_rew_orientation = 0
-        
+
 
     observation = self._get_obs()
     return observation
@@ -607,7 +620,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
   def reset_obstacle(self, step_height=None, step_location = None):
     """ Resets the Obstale
-    
+
     Args:
       step_height (float): The height of the obstacle.
       step_location (float): The location of the obstacle.
@@ -616,12 +629,12 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       self.step_height = step_height
     else:
       if self._randomize_step_height:
-        self.step_height = np.random.uniform(self.step_min_height, self.step_max_height)   
+        self.step_height = np.random.uniform(self.step_min_height, self.step_max_height)
       else:
         self.step_height = self.step_default_height
 
     if step_location is not None:
-      self.step_location = step_location + self.step0_xpos 
+      self.step_location = step_location + self.step0_xpos
     else:
       if self._randomize_step_location:
         self.step_location = np.random.uniform(self.step_min_location, self.step_max_location) + self.step0_xpos
@@ -680,7 +693,8 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     elif self._task_name == 'jumpup':
       self.relative_location_of_left_edge = (self.model.body_pos[self.step0_idx, 0] - self.model.geom_size[self.step0geom_idx, 0]) - joint_states[0]
     elif self._task_name == 'stairs':
-      raise NotImplementedError('Sensing not defined for stairs!')
+      self.relative_location_of_left_edge = (self.model.body_pos[self.step0_idx, 0] - self.model.geom_size[self.step0geom_idx, 0]) - joint_states[0]
+      # raise NotImplementedError('Sensing not defined for stairs!')
 
     augmented_obs = {}
     augmented_obs['obs'] = joint_states
@@ -767,7 +781,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       return True
     else:
       return False
-    
+
 
 
   def should_terminate(self):
@@ -809,7 +823,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     x_before = prev_state[0]
     self.x_vel = (self.x_after - x_before)/(self.dt)
     self.forward_reward = self._forward_reward_weight * self.x_vel
-    
+
     # Orientation
     # TODO: Check if the indices used for the state are correct
     self.orientation_cost = quat_dist(curr_state[3:7], np.array([0.5, 0.5, 0.5, 0.5]))
@@ -826,7 +840,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     self.gym_rew_fwd += self.forward_reward
     self.gym_rew_ctrl += (-self.ctrl_cost)
     self.gym_rew_orientation += (-self.orientation_cost)
-    
+
     return reward
 
 
@@ -885,9 +899,9 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       self.do_simulation(action, self.frame_skip)
     except mujoco_py.MujocoException:
       print(f"Mujoco Exception!\n for state: {prev_state} \n and action: {action}")
-      traceback.print_exc() 
+      traceback.print_exc()
       return self.get_augmented_observation(), 0, True, self.get_info()
-    curr_state = self._get_obs() 
+    curr_state = self._get_obs()
 
     # update some info
     self.max_height = max(self.max_height, curr_state[self.robot_height_index])
@@ -895,7 +909,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
 
     # increase the step counter
-    self.step_number += 1 
+    self.step_number += 1
 
     # move the overlay model if required
     if self.should_move_overlay():
@@ -915,7 +929,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
 class Dataset(object):
     def __init__(self, base_folder = "CMAES_helper/data", robot_name = "laikago", task = None, stage = 0, load_actions = False):
-        assert task in ["jumpup", "jumpdown", "hurdle", "sequential"], f"Unknown task {task}. Choices are [jumpup, jumpdown, hurdle]"
+        assert task in ["jumpup", "stairs", "hurdle"], f"Unknown task {task}. Choices are [jumpup, stairs, hurdle]"
         self.base_folder = os.path.join(*[base_folder, robot_name, task])
         self.robot_name = robot_name
         self.stage = stage
