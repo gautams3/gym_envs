@@ -358,7 +358,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     elif self._task_name == 'jumpup':
       self.x_beyond_obstacle = 1
     elif self._task_name == 'stairs':
-      self.x_beyond_obstacle = 5
+      self.x_beyond_obstacle = 3
       # raise NotImplementedError('stairs is not implemented yet!')
 
 
