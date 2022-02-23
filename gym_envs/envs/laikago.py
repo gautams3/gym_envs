@@ -275,7 +275,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       elif self._task_name == 'jumpup':
         self._xml_path = os.path.join(curr_dir, 'assets', 'laikago', 'laikago_jumpup_1.xml')
       elif self._task_name == 'stairs':
-        self._xml_path = os.path.join(curr_dir, 'assets', 'laikago', 'laikago_stairs.xml')
+        self._xml_path = os.path.join(curr_dir, 'assets', 'laikago', 'laikago_stairs_1.xml')
     else:
       if self._task_name is not None:
         print(f"Note: task_name is {self._task_name}. Be sure the provided xml is for this task!")
@@ -358,7 +358,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     elif self._task_name == 'jumpup':
       self.x_beyond_obstacle = 1
     elif self._task_name == 'stairs':
-      self.x_beyond_obstacle = 1
+      self.x_beyond_obstacle = 5
       # raise NotImplementedError('stairs is not implemented yet!')
 
 
@@ -489,12 +489,16 @@ class Laikagov2Env(MujocoEnv, EzPickle):
   def set_stairs_height(self, height):
     """ Set the height of the stairs obstacle
     """
-    raise NotImplementedError('Set the height of the stairs obstacle!')
+    self.model.body_pos[self.step0_idx, 2] = height
+    self.model.body_pos[self.step1_idx, 2] = height + 0.1
+    self.sim.forward() # won't increment timestep by 1
+
+    # raise NotImplementedError('Set the height of the stairs obstacle!')
 
 
   def set_stairs_stage(self, stage):
     step_height = 0.05 * stage
-    self.set_hurdle_height(step_height)
+    self.set_stairs_height(step_height)
     # raise NotImplementedError('Set the stage of the stairs task!')
 
 
@@ -530,6 +534,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
     """ Set the location of the stairs obstacle
     """
     self.model.body_pos[self.step0_idx, 0] = location
+    self.model.body_pos[self.step1_idx, 0] = location + (self.step1_xpos - self.step0_xpos)
     self.sim.forward() # won't increment timestep by 1
     # raise NotImplementedError('Set the location of the stairs obstacle!')
 
@@ -641,8 +646,8 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       else:
         self.step_location = self.step_default_location + self.step0_xpos
 
-    self.set_hurdle_height(self.step_height)
-    self.set_hurdle_location(self.step_location)
+    self.set_obstacle_height(self.step_height)
+    self.set_obstacle_location(self.step_location)
 
     # store the offset between the obstacles new location and the original location
     self.x_offset = self.model.body_pos[self.step0_idx, 0] - self.cma_step_loc
