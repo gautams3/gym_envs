@@ -654,7 +654,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
     # deduce what should be the stage of the obstacle in the overlay
     nearest_larger_step = np.ceil(self.step_height/self.step_inc) * self.step_inc
-    self.stage = get_stage(nearest_larger_step)
+    self.stage = get_stage(min(nearest_larger_step, 0.4))
     self.dataset = self.datasets[self.stage]
 
 
