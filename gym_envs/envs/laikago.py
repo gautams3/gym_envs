@@ -38,10 +38,6 @@ def quat_dist(q1: np.ndarray, q2: np.ndarray) -> float:
   else:
     return 2 * np.arctan2(np.linalg.norm(q_diff[1:]), q_diff[0])
 
-def get_stage(step_height = 0.0):
-  assert np.isclose((step_height*20)%(0.05*20), 0., atol=0.001), f"Step ht ({step_height}) has to be a multiple of 0.05!!"
-  stage = int(np.rint(step_height/0.05))
-  return stage
 
 class LaikagoEnv(MujocoEnv, EzPickle):
   def __init__(self,
@@ -654,7 +650,7 @@ class Laikagov2Env(MujocoEnv, EzPickle):
 
     # deduce what should be the stage of the obstacle in the overlay
     nearest_larger_step = np.ceil(self.step_height/self.step_inc) * self.step_inc
-    self.stage = get_stage(min(nearest_larger_step, 0.4))
+    self.stage = self.get_stage(min(nearest_larger_step, 0.4))
     self.dataset = self.datasets[self.stage]
 
 
@@ -788,6 +784,13 @@ class Laikagov2Env(MujocoEnv, EzPickle):
       return False
 
 
+  def get_stage(self, step_height = 0.0):
+    """ Get the nearest stage of the obstacle given the height.
+    """
+    assert np.isclose((step_height*20)%(0.05*20), 0., atol=0.001), f"Step ht ({step_height}) has to be a multiple of 0.05!!"
+    stage = int(np.rint(step_height/0.05))
+    return stage
+    
 
   def should_terminate(self):
     """ Check if the episode should terminate.
