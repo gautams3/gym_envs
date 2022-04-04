@@ -54,11 +54,11 @@ register(
     max_episode_steps=10000,
 )
 
-register(
-    id='laikago-overlay-v0',
-    entry_point='gym_envs.envs:LaikagoOverlayEnv',
-    max_episode_steps=10000,
-)
+# register(
+#     id='laikago-overlay-v0',
+#     entry_point='gym_envs.envs:LaikagoOverlayEnv',
+#     max_episode_steps=10000,
+# )
 
 register(
     id='laikago-v2',
